@@ -1,0 +1,17 @@
+{
+  "query": "серверное оборудование для центра обработки данных",
+  "items": [
+    {
+      "tender_id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "title": "Supply of server equipment for a municipal data centre",
+      "source": "ted",
+      "source_url": "https://ted.europa.eu/example/123456-2026",
+      "snippet": "Не менее 4 стоечных серверов, два процессора, 256 ГБ оперативной памяти.",
+      "score": 0.8734,
+      "attachment": {
+        "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+        "filename": "sample_tender.pdf"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+digraph G {
+  graph [fontname="DejaVu Sans", bgcolor="#ffffff", rankdir=LR, pad="0.35", nodesep="0.55", ranksep="0.7", splines=ortho];
+  node [fontname="DejaVu Sans", shape=record, style="rounded,filled", color="#cbd5e1", fillcolor="#f8fafc", fontcolor="#172033"];
+  edge [fontname="DejaVu Sans", color="#64748b", arrowsize=0.7];
+
+  sources [label="{sources|id PK\lcode UNIQUE\lcursor\llast_sync_at\l}"];
+  tenders [label="{tenders|id PK\lsource_id FK\lexternal_id\ltitle / amount / dates\lcontent_hash\lindexed_hash\lindex_status\lraw_payload JSONB\l}", fillcolor="#eff6ff"];
+  attachments [label="{attachments|id PK\ltender_id FK\lsource_url\llocal_path\lsha256 / size\ldownload_status\l}"];
+  chunks [label="{chunks|id PK\ltender_id FK\lattachment_id FK?\lchunk_key UNIQUE\lcontent\lembedding VECTOR(1024)\l}", fillcolor="#faf5ff"];
+  keys [label="{api_keys|id PK\lkey_hash UNIQUE\lenabled\llimit_per_minute\lwindow_started_at\lrequest_count\l}", fillcolor="#f0fdf4"];
+
+  sources -> tenders [label="1:N"];
+  tenders -> attachments [label="1:N"];
+  tenders -> chunks [label="1:N"];
+  attachments -> chunks [label="0..1:N"];
+}

@@ -1,0 +1,25 @@
+{
+  "source": "ted",
+  "external_id": "123456-2026",
+  "title": "Supply of server equipment for a municipal data centre",
+  "description": "Supply, installation and warranty support for rack servers and storage systems.",
+  "buyer_name": "Example Municipal Authority",
+  "amount": 1250000.0,
+  "currency": "EUR",
+  "published_at": "2026-08-19T00:00:00Z",
+  "deadline": "2026-09-15T12:00:00Z",
+  "source_url": "https://ted.europa.eu/example/123456-2026",
+  "attachments": [
+    {
+      "external_id": "pdf",
+      "title": "Published notice PDF",
+      "filename": "123456-2026.pdf",
+      "source_url": "https://ted.europa.eu/example/123456-2026.pdf",
+      "content_type": "application/pdf"
+    }
+  ],
+  "raw_payload": {
+    "fixture": true,
+    "publication-number": "123456-2026"
+  }
+}

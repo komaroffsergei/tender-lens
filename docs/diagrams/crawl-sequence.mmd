@@ -1,0 +1,27 @@
+sequenceDiagram
+    participant S as Source Adapter
+    participant C as crawler
+    participant DB as PostgreSQL
+    participant V as Attachment Volume
+    participant N as NATS JetStream
+    participant I as indexer
+    participant O as Ollama
+
+    C->>S: fetch_updates(cursor)
+    S-->>C: TenderRecordV1
+    C->>DB: UPSERT tender + attachment metadata
+    DB-->>C: new / unchanged / changed
+    alt new or changed
+        C->>V: stream attachments to temp + atomic rename
+        C->>DB: COMMIT, index_status=pending
+        C->>N: publish tender.changed.v1
+        N-->>I: durable delivery
+        I->>DB: read tender and attachment metadata
+        I->>V: read supported files
+        I->>O: batch /api/embed
+        O-->>I: vectors[1024]
+        I->>DB: replace chunks + indexed_hash in one transaction
+        I->>N: ACK after COMMIT
+    else unchanged
+        C->>DB: update last seen only
+    end

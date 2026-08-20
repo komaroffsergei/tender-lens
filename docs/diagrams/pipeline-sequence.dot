@@ -1,0 +1,17 @@
+digraph G {
+  graph [fontname="DejaVu Sans", bgcolor="#ffffff", rankdir=TB, pad="0.35", nodesep="0.35", ranksep="0.45"];
+  node [fontname="DejaVu Sans", shape=box, style="rounded,filled", color="#cbd5e1", fillcolor="#f8fafc", fontcolor="#172033", width=3.5];
+  edge [fontname="DejaVu Sans", color="#64748b", fontcolor="#475569"];
+
+  a [label="1. Adapter возвращает TenderRecordV1"];
+  b [label="2. Crawler вычисляет canonical content_hash"];
+  c [label="3. PostgreSQL UPSERT + download attachments"];
+  d [label="4. COMMIT: new/changed остаётся pending"];
+  e [label="5. NATS publish tender.changed.v1", fillcolor="#faf5ff", color="#d8b4fe"];
+  f [label="6. Indexer extract → chunk → batch embeddings"];
+  g [label="7. Транзакционная замена chunks + indexed_hash"];
+  h [label="8. ACK только после COMMIT", fillcolor="#f0fdf4", color="#86efac"];
+  i [label="9. API exact cosine search → grounded answer", fillcolor="#eff6ff", color="#93c5fd"];
+
+  a->b->c->d->e->f->g->h->i;
+}

@@ -1,0 +1,29 @@
+{
+  "status": "partial",
+  "summary": "Пример структуры отчёта. Значения не являются результатом реального запуска.",
+  "repository": {
+    "url": null,
+    "pull_request_url": null,
+    "is_public": null
+  },
+  "git": {
+    "branch": "feature/tender-lens",
+    "head_sha": null,
+    "merge_sha": null,
+    "tag": null
+  },
+  "ci_runs": [],
+  "tests": {
+    "unit": {"status": "not_run", "command": null, "summary": "Пример"},
+    "integration": {"status": "not_run", "command": null, "summary": "Пример"},
+    "e2e": {"status": "not_run", "command": null, "summary": "Пример"},
+    "live": {"status": "not_run", "command": null, "summary": "Пример"},
+    "quality": {"status": "not_run", "command": null, "summary": "Пример"}
+  },
+  "requirements": [],
+  "commands": [],
+  "limitations": [],
+  "blockers": ["Это только пример формата, а не отчёт о выполненной работе."],
+  "recommended_reading": ["README.md", "docs/architecture.md"],
+  "demo_steps": []
+}

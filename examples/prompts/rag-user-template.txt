@@ -1,0 +1,11 @@
+ВОПРОС:
+{query}
+
+КОНТЕКСТ:
+[Фрагмент 1 | tender_id={tender_id_1}]
+{chunk_1}
+
+[Фрагмент 2 | tender_id={tender_id_2}]
+{chunk_2}
+
+Сформируй ответ по правилам system prompt.

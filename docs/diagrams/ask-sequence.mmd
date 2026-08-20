@@ -1,0 +1,25 @@
+sequenceDiagram
+    participant U as Browser
+    participant A as FastAPI API
+    participant DB as PostgreSQL/pgvector
+    participant O as Ollama
+
+    U->>A: POST /api/v1/ask + X-API-Key
+    A->>DB: SELECT API key FOR UPDATE
+    DB-->>A: key + current fixed window
+    A->>DB: atomically increment or reject
+    alt limit exceeded
+        A-->>U: 429 + Retry-After
+    else allowed
+        A->>O: embed(query)
+        O-->>A: query vector
+        A->>DB: exact cosine top 5 chunks
+        DB-->>A: retrieval results
+        alt no context
+            A-->>U: Недостаточно данных + []
+        else context exists
+            A->>O: grounded prompt + chunks
+            O-->>A: answer text
+            A-->>U: answer + sources built from retrieval
+        end
+    end

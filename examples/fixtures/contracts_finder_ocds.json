@@ -1,0 +1,50 @@
+{
+  "fixture_metadata": {
+    "kind": "synthetic_ocds_minimal",
+    "source": "UK Contracts Finder OCDS Search",
+    "endpoint": "GET /Published/Notices/OCDS/Search"
+  },
+  "releases": [
+    {
+      "ocid": "ocds-b5fd17-example-001",
+      "id": "ocds-b5fd17-example-001-2026-08-19",
+      "date": "2026-08-19T09:00:00Z",
+      "tag": [
+        "tender"
+      ],
+      "buyer": {
+        "id": "GB-COH-00000000",
+        "name": "Example Borough Council"
+      },
+      "tender": {
+        "id": "CF-EXAMPLE-001",
+        "title": "Data centre hardware and support",
+        "description": "Provision of rack servers, network storage and three years of support.",
+        "status": "active",
+        "value": {
+          "amount": 980000.0,
+          "currency": "GBP"
+        },
+        "tenderPeriod": {
+          "startDate": "2026-08-19T09:00:00Z",
+          "endDate": "2026-09-20T12:00:00Z"
+        },
+        "documents": [
+          {
+            "id": "DOC-1",
+            "documentType": "technicalSpecifications",
+            "title": "Technical specification",
+            "url": "https://www.contractsfinder.service.gov.uk/example/specification.pdf",
+            "format": "application/pdf"
+          }
+        ]
+      },
+      "links": {
+        "self": "https://www.contractsfinder.service.gov.uk/Notice/example-001"
+      }
+    }
+  ],
+  "links": {
+    "next": "https://www.contractsfinder.service.gov.uk/Published/Notices/OCDS/Search?cursor=next-example"
+  }
+}

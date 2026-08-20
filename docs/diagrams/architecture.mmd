@@ -1,0 +1,21 @@
+flowchart LR
+    TED[TED Search API] --> CRAWLER
+    CF[Contracts Finder OCDS] --> CRAWLER
+
+    subgraph APP[Один Python package / один Docker image]
+        CRAWLER[crawler role\nadapters + persistence + files]
+        INDEXER[indexer role\nextract + chunk + embed]
+        API[api role\nFastAPI + auth + limiter + RAG]
+    end
+
+    CRAWLER -->|metadata| PG[(PostgreSQL + pgvector)]
+    CRAWLER -->|attachments| VOL[(Docker volume)]
+    CRAWLER -->|tender.changed.v1| NATS[(NATS JetStream)]
+    NATS -->|durable pull / explicit ACK| INDEXER
+    INDEXER -->|read| PG
+    INDEXER -->|read| VOL
+    INDEXER -->|batch embeddings| OLLAMA[Ollama]
+    INDEXER -->|chunks + vectors| PG
+    API -->|exact cosine search| PG
+    API -->|embed + generate| OLLAMA
+    BROWSER[Static HTML/CSS/JS] -->|HTTP + X-API-Key| API

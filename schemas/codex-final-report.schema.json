@@ -1,0 +1,253 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/codex-final-report.schema.json",
+  "title": "CodexFinalReport",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "summary",
+    "repository",
+    "git",
+    "ci_runs",
+    "tests",
+    "requirements",
+    "commands",
+    "limitations",
+    "blockers",
+    "recommended_reading"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "complete",
+        "partial",
+        "blocked"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "pull_request_url",
+        "is_public"
+      ],
+      "properties": {
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pull_request_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "is_public": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      }
+    },
+    "git": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "branch",
+        "head_sha",
+        "merge_sha",
+        "tag"
+      ],
+      "properties": {
+        "branch": {
+          "type": "string"
+        },
+        "head_sha": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "merge_sha": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tag": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "ci_runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "url",
+          "conclusion",
+          "commit_sha"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "conclusion": {
+            "type": "string",
+            "enum": [
+              "success",
+              "failure",
+              "cancelled",
+              "skipped",
+              "unknown"
+            ]
+          },
+          "commit_sha": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "tests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unit",
+        "integration",
+        "e2e",
+        "live",
+        "quality"
+      ],
+      "properties": {
+        "unit": {
+          "$ref": "#/$defs/testResult"
+        },
+        "integration": {
+          "$ref": "#/$defs/testResult"
+        },
+        "e2e": {
+          "$ref": "#/$defs/testResult"
+        },
+        "live": {
+          "$ref": "#/$defs/testResult"
+        },
+        "quality": {
+          "$ref": "#/$defs/testResult"
+        }
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "status",
+          "evidence"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "blocked",
+              "deferred"
+            ]
+          },
+          "evidence": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "recommended_reading": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "demo_steps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "testResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "command",
+        "summary"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "passed",
+            "failed",
+            "skipped",
+            "not_run"
+          ]
+        },
+        "command": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

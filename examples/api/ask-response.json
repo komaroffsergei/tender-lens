@@ -1,0 +1,12 @@
+{
+  "answer": "Требуются не менее четырёх стоечных серверов с двумя процессорами и 256 ГБ оперативной памяти, а также гарантия не менее 36 месяцев.",
+  "sources": [
+    {
+      "tender_id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "title": "Supply of server equipment for a municipal data centre",
+      "source_url": "https://ted.europa.eu/example/123456-2026",
+      "snippet": "Не менее 4 стоечных серверов, два процессора, 256 ГБ оперативной памяти.",
+      "score": 0.8734
+    }
+  ]
+}

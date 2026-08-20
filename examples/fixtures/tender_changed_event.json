@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "event_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "occurred_at": "2026-08-20T10:00:00Z",
+  "tender_id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+  "content_hash": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+}

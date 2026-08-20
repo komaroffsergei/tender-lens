@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Runtime data
+attachments/
+.tmp/
+*.log
+codex-run.jsonl
+codex-final-report.json
+BLOCKERS.md
+
+# Local models and downloaded live data
+models/
+live-data/
+
+# Build
+dist/
+build/
+*.egg-info/

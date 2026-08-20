@@ -1,0 +1,50 @@
+erDiagram
+    SOURCES ||--o{ TENDERS : contains
+    TENDERS ||--o{ ATTACHMENTS : has
+    TENDERS ||--o{ CHUNKS : indexed_as
+    ATTACHMENTS o|--o{ CHUNKS : source_of
+
+    SOURCES {
+        uuid id PK
+        varchar code UK
+        text cursor
+        timestamptz last_sync_at
+    }
+    TENDERS {
+        uuid id PK
+        uuid source_id FK
+        text external_id UK
+        text title
+        numeric amount
+        char content_hash
+        char indexed_hash
+        varchar index_status
+        jsonb raw_payload
+    }
+    ATTACHMENTS {
+        uuid id PK
+        uuid tender_id FK
+        text source_url UK
+        text local_path
+        char sha256
+        bigint size_bytes
+        varchar download_status
+    }
+    CHUNKS {
+        uuid id PK
+        uuid tender_id FK
+        uuid attachment_id FK
+        char chunk_key UK
+        int position
+        text content
+        vector embedding
+        varchar embedding_model
+    }
+    API_KEYS {
+        uuid id PK
+        char key_hash UK
+        bool enabled
+        int limit_per_minute
+        timestamptz window_started_at
+        int request_count
+    }

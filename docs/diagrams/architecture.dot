@@ -1,0 +1,35 @@
+digraph G {
+  graph [fontname="DejaVu Sans", bgcolor="#f3f5f9", rankdir=LR, pad="0.35", nodesep="0.45", ranksep="0.65", splines=spline];
+  node [fontname="DejaVu Sans", shape=box, style="rounded,filled", color="#cbd5e1", fillcolor="#ffffff", fontcolor="#172033", margin="0.18,0.12"];
+  edge [fontname="DejaVu Sans", color="#64748b", fontcolor="#475569", arrowsize=0.75];
+
+  ted [label="TED Search API", fillcolor="#eef2ff", color="#a5b4fc"];
+  cf [label="Contracts Finder\nOCDS", fillcolor="#fff7ed", color="#fdba74"];
+  browser [label="Статический клиент\nHTML/CSS/JS", fillcolor="#f0fdf4", color="#86efac"];
+
+  subgraph cluster_app {
+    label="Один Python package / один Docker image";
+    fontname="DejaVu Sans"; fontcolor="#334155"; color="#cbd5e1"; style="rounded,dashed";
+    crawler [label="crawler\nадаптеры · upsert · вложения", fillcolor="#ffffff"];
+    indexer [label="indexer\nextract · chunk · embed", fillcolor="#ffffff"];
+    api [label="api\nFastAPI · auth · limiter · RAG", fillcolor="#ffffff"];
+  }
+
+  pg [label="PostgreSQL + pgvector\n5 таблиц · exact cosine", shape=cylinder, fillcolor="#eff6ff", color="#93c5fd"];
+  nats [label="NATS JetStream\nTENDERS / tender.changed.v1", shape=cylinder, fillcolor="#faf5ff", color="#d8b4fe"];
+  vol [label="Docker volume\nattachments", shape=cylinder, fillcolor="#f8fafc"];
+  ollama [label="Ollama\nqwen3-embedding:0.6b\nqwen3:1.7b", fillcolor="#fefce8", color="#fde047"];
+
+  ted -> crawler [label="async HTTP"];
+  cf -> crawler [label="async HTTP"];
+  crawler -> pg [label="metadata"];
+  crawler -> vol [label="stream files"];
+  crawler -> nats [label="publish after commit"];
+  nats -> indexer [label="durable pull / ACK"];
+  indexer -> pg [label="read + chunks"];
+  vol -> indexer [label="read-only"];
+  indexer -> ollama [label="batch embed"];
+  browser -> api [label="HTTP + X-API-Key"];
+  api -> pg [label="auth + rate + search"];
+  api -> ollama [label="embed + generate"];
+}
