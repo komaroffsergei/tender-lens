@@ -1,0 +1,25 @@
+name: tender-lens-test
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: tender_lens_test
+      POSTGRES_USER: tender_lens
+      POSTGRES_PASSWORD: tender_lens
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tender_lens -d tender_lens_test"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    ports:
+      - "55432:5432"
+  nats:
+    image: nats:2.10-alpine
+    command: ["-js", "-sd", "/data", "-m", "8222"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8222/healthz"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    ports:
+      - "54222:4222"

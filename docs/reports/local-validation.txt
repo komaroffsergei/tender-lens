@@ -1,0 +1,49 @@
+TenderLens v0.1.0: локальная верификация
+Дата: 2026-08-20
+Commit: 24c0cf9
+Branch: feature/tender-lens
+Python: Python 3.13.5
+Node: v22.16.0
+
+$ python -m pytest -q
+..............sssssssssss............................................... [ 61%]
+.............................................                            [100%]
+=========================== short test summary info ============================
+SKIPPED [2] tests/e2e/test_fixture_pipeline.py:67: e2e disabled; set RUN_INTEGRATION=1
+SKIPPED [1] tests/e2e/test_fixture_pipeline.py:131: e2e disabled; set RUN_INTEGRATION=1
+SKIPPED [1] tests/integration/test_database_pipeline.py:42: integration tests disabled; set RUN_INTEGRATION=1
+SKIPPED [1] tests/integration/test_database_pipeline.py:64: integration tests disabled; set RUN_INTEGRATION=1
+SKIPPED [1] tests/integration/test_database_pipeline.py:88: integration tests disabled; set RUN_INTEGRATION=1
+SKIPPED [1] tests/integration/test_database_pipeline.py:113: integration tests disabled; set RUN_INTEGRATION=1
+SKIPPED [1] tests/integration/test_database_pipeline.py:148: integration tests disabled; set RUN_INTEGRATION=1
+SKIPPED [1] tests/integration/test_database_pipeline.py:171: integration tests disabled; set RUN_INTEGRATION=1
+SKIPPED [1] tests/integration/test_nats.py:14: integration tests disabled; set RUN_INTEGRATION=1
+SKIPPED [1] tests/integration/test_nats.py:29: integration tests disabled; set RUN_INTEGRATION=1
+106 passed, 11 skipped in 3.02s
+
+$ python -m compileall -q src tests scripts migrations
+OK
+
+$ node --check src/tender_lens/web/app.js
+OK
+
+$ bash -n scripts/*.sh examples/*.sh run-codex.sh
+OK
+
+$ JSON/YAML parse
+OK
+
+$ python -m pip wheel --no-deps --no-build-isolation -w /tmp/tender-wheel .
+WARNING: The directory '/home/oai/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.
+Processing /mnt/data/tender-lens-project
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: tender-lens
+  Building wheel for tender-lens (pyproject.toml): started
+  Building wheel for tender-lens (pyproject.toml): finished with status 'done'
+  Created wheel for tender-lens: filename=tender_lens-0.1.0-py3-none-any.whl size=59171 sha256=03453a87ace466201b80c69f42c9d16f03a16689bb309804d1451df2661b0712
+  Stored in directory: /tmp/pip-ephem-wheel-cache-7mcalqqo/wheels/7a/fc/0d/030a9c480a038adee5a0161c8daa8e091e2e4429cf19c6ab78
+Successfully built tender-lens
+
+$ git diff --check
+OK

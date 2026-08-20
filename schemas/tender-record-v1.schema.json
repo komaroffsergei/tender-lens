@@ -1,125 +1,195 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.local/schemas/tender-record-v1.schema.json",
-  "title": "TenderRecordV1",
-  "type": "object",
+  "$defs": {
+    "AttachmentRecordV1": {
+      "additionalProperties": false,
+      "properties": {
+        "external_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "External Id"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "filename": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "title": "Filename",
+          "type": "string"
+        },
+        "source_url": {
+          "format": "uri",
+          "minLength": 1,
+          "title": "Source Url",
+          "type": "string"
+        },
+        "content_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Content Type"
+        }
+      },
+      "required": [
+        "filename",
+        "source_url"
+      ],
+      "title": "AttachmentRecordV1",
+      "type": "object"
+    }
+  },
   "additionalProperties": false,
+  "properties": {
+    "source": {
+      "enum": [
+        "ted",
+        "contracts_finder"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "external_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "title": "External Id",
+      "type": "string"
+    },
+    "title": {
+      "maxLength": 10000,
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Description"
+    },
+    "buyer_name": {
+      "anyOf": [
+        {
+          "maxLength": 5000,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Buyer Name"
+    },
+    "amount": {
+      "anyOf": [
+        {
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Amount"
+    },
+    "currency": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Currency"
+    },
+    "published_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Published At"
+    },
+    "deadline": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Deadline"
+    },
+    "source_url": {
+      "format": "uri",
+      "minLength": 1,
+      "title": "Source Url",
+      "type": "string"
+    },
+    "attachments": {
+      "items": {
+        "$ref": "#/$defs/AttachmentRecordV1"
+      },
+      "title": "Attachments",
+      "type": "array"
+    },
+    "raw_payload": {
+      "additionalProperties": true,
+      "title": "Raw Payload",
+      "type": "object"
+    }
+  },
   "required": [
     "source",
     "external_id",
     "title",
     "source_url",
-    "attachments",
     "raw_payload"
   ],
-  "properties": {
-    "source": {
-      "type": "string",
-      "enum": [
-        "ted",
-        "contracts_finder"
-      ]
-    },
-    "external_id": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 512
-    },
-    "title": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 10000
-    },
-    "description": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "buyer_name": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "maxLength": 5000
-    },
-    "amount": {
-      "type": [
-        "number",
-        "null"
-      ],
-      "minimum": 0
-    },
-    "currency": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "pattern": "^[A-Z]{3}$"
-    },
-    "published_at": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "format": "date-time"
-    },
-    "deadline": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "format": "date-time"
-    },
-    "source_url": {
-      "type": "string",
-      "format": "uri",
-      "pattern": "^https?://"
-    },
-    "attachments": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "filename",
-          "source_url"
-        ],
-        "properties": {
-          "external_id": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "title": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "filename": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 1024
-          },
-          "source_url": {
-            "type": "string",
-            "format": "uri",
-            "pattern": "^https?://"
-          },
-          "content_type": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "maxLength": 255
-          }
-        }
-      }
-    },
-    "raw_payload": {
-      "type": "object"
-    }
-  }
+  "title": "TenderRecordV1",
+  "type": "object"
 }

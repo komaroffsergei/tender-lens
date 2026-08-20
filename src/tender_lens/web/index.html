@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="TenderLens: смысловой поиск и локальный RAG по открытым закупкам">
+  <title>TenderLens</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="TenderLens, главная">
+      <span class="brand-mark" aria-hidden="true">TL</span>
+      <span><strong>TenderLens</strong><small>TED + Contracts Finder</small></span>
+    </a>
+    <span id="health" class="status-pill" aria-live="polite">Проверяем API…</span>
+  </header>
+
+  <main class="layout">
+    <section class="hero">
+      <p class="eyebrow">Открытые закупки · pgvector · локальный Ollama</p>
+      <h1>Поиск по смыслу, а не по удачному совпадению букв</h1>
+      <p>Система асинхронно собирает закупки, индексирует метаданные и документы, затем возвращает релевантные фрагменты и проверяемую выжимку.</p>
+    </section>
+
+    <section class="workspace" aria-labelledby="workspace-title">
+      <div class="search-panel">
+        <h2 id="workspace-title" class="sr-only">Запрос к базе закупок</h2>
+        <label for="api-key">API-ключ</label>
+        <div class="inline-control">
+          <input id="api-key" type="password" autocomplete="off" placeholder="tl_…">
+          <button id="save-key" class="button ghost" type="button">Сохранить в сессии</button>
+        </div>
+        <small>Ключ хранится только в sessionStorage текущей вкладки.</small>
+
+        <label class="query-label" for="query">Запрос</label>
+        <textarea id="query" rows="5" maxlength="1000" placeholder="Например: поставка серверов и системы хранения с гарантией 36 месяцев"></textarea>
+
+        <div class="actions-row">
+          <div class="segmented" role="group" aria-label="Режим запроса">
+            <button class="segment active" data-mode="search" type="button">Поиск</button>
+            <button class="segment" data-mode="ask" type="button">Ответ по базе</button>
+          </div>
+          <button id="submit" class="button primary" type="button">Выполнить запрос</button>
+        </div>
+      </div>
+
+      <aside class="side-panel">
+        <h2>Что происходит</h2>
+        <ol>
+          <li>Запрос превращается в embedding.</li>
+          <li>PostgreSQL находит ближайшие чанки.</li>
+          <li>В режиме ответа Ollama видит только найденный контекст.</li>
+        </ol>
+        <div class="limit-card">
+          <strong>Общий лимит Search + Ask</strong>
+          <span id="rate-state">Будет показан после запроса</span>
+        </div>
+      </aside>
+    </section>
+
+    <section id="notice" class="notice" role="status" aria-live="polite" hidden></section>
+
+    <section id="answer-card" class="answer-card" hidden>
+      <div class="section-label">Ответ по найденным документам</div>
+      <p id="answer-text"></p>
+      <small>Модель получает только показанные ниже источники. Документы трактуются как данные, а не как инструкции.</small>
+    </section>
+
+    <section class="results-section" aria-labelledby="results-title">
+      <div class="results-head">
+        <div>
+          <div class="section-label">Релевантные источники</div>
+          <h2 id="results-title">Результаты</h2>
+        </div>
+        <span class="sort-note">Exact cosine search · top 1–10</span>
+      </div>
+      <div id="results" class="results-list"></div>
+      <p id="empty" class="empty">Введите запрос длиной не менее трёх символов.</p>
+    </section>
+  </main>
+
+  <footer>
+    <span>TenderLens 0.1.0</span>
+    <span>Без CDN, npm и прочего обряда вызова одного fetch.</span>
+  </footer>
+</body>
+</html>
