@@ -20,6 +20,7 @@
 - Документация: https://docs.ted.europa.eu/api/latest/search.html
 - Endpoint: `POST https://api.ted.europa.eu/v3/notices/search`
 - Search API предназначен для поиска опубликованных notices и не требует authentication.
+- Проверено 2026-08-20: default query `notice-type = cn-standard SORT BY publication-date DESC`; используются текущие fields `publication-date`, `description-proc`, `estimated-value-proc` и совместимые fallback aliases для fixtures.
 
 Перед coding:
 

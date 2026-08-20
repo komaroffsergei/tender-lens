@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import random
-from collections.abc import AsyncIterator, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -32,6 +32,8 @@ class SourceAdapter(Protocol):
     async def fetch_page(self, cursor: str | None, limit: int) -> SourcePage:
         """Получить и нормализовать одну страницу/итерацию источника."""
 
+        ...
+
 
 class ResilientHttpClient:
     """HTTP-клиент с bounded concurrency, retry и проверкой redirect host."""
@@ -46,8 +48,9 @@ class ResilientHttpClient:
         jitter_seconds: float,
         user_agent: str,
         allowed_hosts: set[str],
+        forbidden_cooldown_seconds: float | None = None,
         client: httpx.AsyncClient | None = None,
-        sleep: Callable[[float], Any] = asyncio.sleep,
+        sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
         random_value: Callable[[], float] = random.random,
     ) -> None:
         self._semaphore = asyncio.BoundedSemaphore(max_concurrency)
@@ -56,6 +59,7 @@ class ResilientHttpClient:
         self._base_delay = base_delay_seconds
         self._jitter = jitter_seconds
         self._allowed_hosts = {host.lower() for host in allowed_hosts}
+        self._forbidden_cooldown = forbidden_cooldown_seconds
         self._sleep = sleep
         self._random = random_value
         self._owns_client = client is None
@@ -82,7 +86,19 @@ class ResilientHttpClient:
         if parsed.hostname.lower() not in self._allowed_hosts:
             raise SourceRequestError(f"Host не разрешён политикой crawler: {parsed.hostname}")
 
+    def _is_retryable_status(self, status_code: int) -> bool:
+        statuses = {429, 500, 502, 503, 504}
+        return status_code in statuses or (
+            status_code == 403 and self._forbidden_cooldown is not None
+        )
+
     def _retry_delay(self, response: httpx.Response | None, attempt: int) -> float:
+        if (
+            response is not None
+            and response.status_code == 403
+            and self._forbidden_cooldown is not None
+        ):
+            return self._forbidden_cooldown
         if response is not None:
             raw = response.headers.get("Retry-After")
             if raw:
@@ -91,11 +107,12 @@ class ResilientHttpClient:
                 except ValueError:
                     try:
                         retry_at = parsedate_to_datetime(raw)
+                    except (TypeError, ValueError, OverflowError):
+                        retry_at = None
+                    if retry_at is not None:
                         if retry_at.tzinfo is None:
                             retry_at = retry_at.replace(tzinfo=UTC)
                         return max(0.0, (retry_at - datetime.now(UTC)).total_seconds())
-                    except (TypeError, ValueError, OverflowError):
-                        pass
         exponential = self._base_delay * (2 ** max(0, attempt - 1))
         return exponential + self._jitter * self._random()
 
@@ -139,7 +156,7 @@ class ResilientHttpClient:
                 self._validate_host(current_url)
                 continue
 
-            if response.status_code in {429, 500, 502, 503, 504}:
+            if self._is_retryable_status(response.status_code):
                 if attempt == self._max_attempts:
                     raise SourceRequestError(
                         f"Источник ответил HTTP {response.status_code} после {attempt} попыток"
@@ -190,11 +207,15 @@ class ResilientHttpClient:
             await self._polite_delay()
             await self._semaphore.acquire()
             response: httpx.Response | None = None
-            action = "success"
+            action = "failed"
             delay = 0.0
             try:
                 request = self._client.build_request("GET", current_url)
-                response = await self._client.send(request, stream=True, follow_redirects=False)
+                response = await self._client.send(
+                    request,
+                    stream=True,
+                    follow_redirects=False,
+                )
 
                 if response.is_redirect:
                     location = response.headers.get("Location")
@@ -206,7 +227,7 @@ class ResilientHttpClient:
                     current_url = urljoin(str(response.url), location)
                     self._validate_host(current_url)
                     action = "redirect"
-                elif response.status_code in {429, 500, 502, 503, 504}:
+                elif self._is_retryable_status(response.status_code):
                     if attempt == self._max_attempts:
                         raise SourceRequestError(
                             f"Загрузка файла завершилась HTTP {response.status_code}"
@@ -214,7 +235,12 @@ class ResilientHttpClient:
                     delay = self._retry_delay(response, attempt)
                     action = "retry"
                 else:
-                    response.raise_for_status()
+                    try:
+                        response.raise_for_status()
+                    except httpx.HTTPStatusError as exc:
+                        raise SourceRequestError(
+                            f"Загрузка файла завершилась HTTP {exc.response.status_code}"
+                        ) from exc
                     try:
                         yield response
                     finally:
@@ -223,15 +249,9 @@ class ResilientHttpClient:
                     return
             except (httpx.TimeoutException, httpx.NetworkError) as exc:
                 last_error = exc
-                if attempt == self._max_attempts:
-                    action = "failed"
-                else:
+                if attempt < self._max_attempts:
                     delay = self._retry_delay(None, attempt)
                     action = "retry"
-            except httpx.HTTPStatusError as exc:
-                raise SourceRequestError(
-                    f"Загрузка файла завершилась HTTP {exc.response.status_code}"
-                ) from exc
             finally:
                 if response is not None:
                     await response.aclose()

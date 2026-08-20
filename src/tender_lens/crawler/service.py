@@ -9,13 +9,11 @@ from datetime import UTC, datetime
 from typing import Protocol
 from uuid import UUID
 
-import sqlalchemy as sa
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from tender_lens.config import Settings
 from tender_lens.db import SessionFactory
-from tender_lens.errors import AppError
 from tender_lens.hashing import tender_content_hash
 from tender_lens.models import Attachment, Source, Tender
 from tender_lens.schemas import TenderChangedV1, TenderRecordV1
@@ -224,7 +222,7 @@ class CrawlerService:
         try:
             await self._publisher.publish_tender_changed(event)
             return True
-        except AppError:
+        except Exception:
             logger.error(
                 "NATS publish не выполнен; pending будет переопубликован следующим циклом",
                 extra={"tender_id": str(tender_id), "event_id": str(event.event_id)},

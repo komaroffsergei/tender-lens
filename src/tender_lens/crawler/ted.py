@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+import logging
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
 from tender_lens.crawler.base import ResilientHttpClient, SourcePage
 from tender_lens.schemas import AttachmentRecordV1, TenderRecordV1
+
+logger = logging.getLogger(__name__)
 
 
 def _first(value: Any) -> Any:
@@ -77,11 +80,15 @@ class TedAdapter:
             "publication-number",
             "notice-title",
             "buyer-name",
-            "notice-publication-date",
-            "deadline-receipt-tender-date",
-            "estimated-value",
-            "estimated-value-currency",
-            "description-procurement",
+            "publication-date",
+            "deadline",
+            "deadline-receipt-request",
+            "deadline-receipt-tender-date-lot",
+            "estimated-value-proc",
+            "estimated-value-cur-proc",
+            "total-value",
+            "total-value-cur",
+            "description-proc",
             "links",
         ]
         payload: dict[str, Any] = {
@@ -96,7 +103,23 @@ class TedAdapter:
             payload["iterationNextToken"] = cursor
         data = await self._client.post_json(f"{self._base_url}/v3/notices/search", payload)
         notices = data.get("notices") or []
-        records = [self.map_notice(item) for item in notices if isinstance(item, dict)]
+        records: list[TenderRecordV1] = []
+        for index, item in enumerate(notices if isinstance(notices, list) else []):
+            if not isinstance(item, dict):
+                logger.warning(
+                    "TED notice пропущен: ожидается JSON object",
+                    extra={"item_index": index},
+                )
+                continue
+            try:
+                records.append(self.map_notice(item))
+            except (TypeError, ValueError) as exc:
+                # Одна испорченная запись не должна обрывать обработку всей страницы.
+                logger.warning(
+                    "TED notice пропущен: %s",
+                    exc,
+                    extra={"item_index": index},
+                )
         next_cursor = _string(data.get("iterationNextToken"))
         return SourcePage(records=records, next_cursor=next_cursor)
 
@@ -133,18 +156,31 @@ class TedAdapter:
             external_id=external_id,
             title=title,
             description=_string(
-                notice.get("description-procurement") or notice.get("description")
+                notice.get("description-proc")
+                or notice.get("description-procurement")
+                or notice.get("description")
             ),
             buyer_name=_string(notice.get("buyer-name") or notice.get("buyer")),
-            amount=_decimal(notice.get("estimated-value") or notice.get("estimatedValue")),
+            amount=_decimal(
+                notice.get("estimated-value-proc")
+                or notice.get("total-value")
+                or notice.get("estimated-value")
+                or notice.get("estimatedValue")
+            ),
             currency=_string(
-                notice.get("estimated-value-currency") or notice.get("currency")
+                notice.get("estimated-value-cur-proc")
+                or notice.get("total-value-cur")
+                or notice.get("estimated-value-currency")
+                or notice.get("currency")
             ),
             published_at=_datetime(
-                notice.get("notice-publication-date") or notice.get("publication-date")
+                notice.get("publication-date") or notice.get("notice-publication-date")
             ),
             deadline=_datetime(
-                notice.get("deadline-receipt-tender-date") or notice.get("deadline")
+                notice.get("deadline")
+                or notice.get("deadline-receipt-request")
+                or notice.get("deadline-receipt-tender-date-lot")
+                or notice.get("deadline-receipt-tender-date")
             ),
             source_url=html_url,
             attachments=attachments,

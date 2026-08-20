@@ -42,7 +42,11 @@ def _error_response(request: Request, error: AppError) -> JSONResponse:
             details=details,
         )
     )
-    return JSONResponse(status_code=error.status_code, content=body.model_dump(mode="json"), headers=headers)
+    return JSONResponse(
+        status_code=error.status_code,
+        content=body.model_dump(mode="json"),
+        headers=headers,
+    )
 
 
 def create_app(
@@ -113,7 +117,10 @@ def create_app(
             "validation_error",
             "Запрос не прошёл валидацию.",
             422,
-            details=[{key: value for key, value in item.items() if key not in {"ctx", "url"}} for item in error.errors()],
+            details=[
+                {key: value for key, value in item.items() if key not in {"ctx", "url"}}
+                for item in error.errors()
+            ],
         )
         return _error_response(request, app_error)
 

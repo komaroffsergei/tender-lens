@@ -5,12 +5,10 @@ x-app: &app
     context: .
   env_file:
     - .env
+  environment:
+    # Shell override нужен demo/live scripts; остальные значения приходят из .env.
+    AI_MODE: ${AI_MODE:-fake}
   restart: unless-stopped
-  depends_on:
-    postgres:
-      condition: service_healthy
-    nats:
-      condition: service_healthy
   volumes:
     - attachments_data:/data/attachments
 
@@ -46,20 +44,48 @@ services:
       - nats_data:/data
 
   ollama:
-    image: ollama/ollama:latest
+    image: ollama/ollama:0.32.6
     profiles: ["ai"]
     ports:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  model-init:
+    image: ollama/ollama:0.32.6
+    profiles: ["ai"]
+    restart: "no"
+    env_file:
+      - .env
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        ollama pull $${EMBEDDING_MODEL:-qwen3-embedding:0.6b} &&
+        ollama pull $${GENERATION_MODEL:-qwen3:1.7b}
 
   migrate:
     <<: *app
     restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
     command: ["alembic", "upgrade", "head"]
 
   api:
     <<: *app
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
     command: ["uvicorn", "tender_lens.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
     ports:
       - "8000:8000"
@@ -71,10 +97,20 @@ services:
 
   crawler:
     <<: *app
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      nats:
+        condition: service_healthy
     command: ["python", "-m", "tender_lens.crawler"]
 
   indexer:
     <<: *app
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      nats:
+        condition: service_healthy
     command: ["python", "-m", "tender_lens.indexer"]
 
 volumes:

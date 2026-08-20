@@ -15,20 +15,35 @@ docker compose up -d indexer api
 
 docker compose run --rm api python -m tender_lens.cli seed-demo --fixture-dir /app/examples/fixtures
 
+ready=0
 for _ in $(seq 1 60); do
   ready=$(docker compose exec -T postgres psql -U tender_lens -d tender_lens -Atc \
     "select count(*) from tenders where index_status='ready';" 2>/dev/null || echo 0)
   if [ "${ready}" -ge 2 ]; then break; fi
   sleep 1
 done
+if [ "${ready}" -lt 2 ]; then
+  echo "Fixture-закупки не были проиндексированы за 60 секунд." >&2
+  docker compose logs indexer >&2
+  exit 1
+fi
 
 key_json=$(docker compose run --rm api python -m tender_lens.cli create-api-key --name demo-$(date +%s) --limit 5)
 api_key=$(printf '%s' "$key_json" | python -c 'import json,sys; print(json.load(sys.stdin)["api_key"])')
 
+api_ready=0
 for _ in $(seq 1 60); do
-  if curl -fsS http://localhost:8000/health/live >/dev/null; then break; fi
+  if curl -fsS http://localhost:8000/health/live >/dev/null; then
+    api_ready=1
+    break
+  fi
   sleep 1
 done
+if [ "$api_ready" != "1" ]; then
+  echo "API не стал доступен за 60 секунд." >&2
+  docker compose logs api >&2
+  exit 1
+fi
 
 printf '\nSEARCH:\n'
 curl -fsS -H "X-API-Key: $api_key" -H 'Content-Type: application/json' \

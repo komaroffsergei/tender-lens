@@ -31,7 +31,7 @@ def utc_now() -> datetime:
 
 
 class Base(DeclarativeBase):
-    pass
+    """Общая declarative base без runtime-побочных эффектов."""
 
 
 class Source(Base):

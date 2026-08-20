@@ -211,13 +211,25 @@ async def seed_demo(fixture_dir: Path) -> None:
     print(json.dumps({"seeded_tenders": inserted}, ensure_ascii=False))
 
 
+def _limit_value(raw: str) -> int:
+    """Проверяет CLI-лимит без громоздкого вывода тысячи вариантов argparse."""
+
+    try:
+        value = int(raw)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("limit должен быть целым числом") from exc
+    if not 1 <= value <= 1000:
+        raise argparse.ArgumentTypeError("limit должен находиться в диапазоне 1..1000")
+    return value
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="TenderLens maintenance CLI")
     sub = parser.add_subparsers(dest="command", required=True)
 
     create = sub.add_parser("create-api-key")
     create.add_argument("--name", required=True)
-    create.add_argument("--limit", type=int, default=5, choices=range(1, 1001), metavar="1..1000")
+    create.add_argument("--limit", type=_limit_value, default=5, metavar="1..1000")
 
     disable = sub.add_parser("disable-api-key")
     disable.add_argument("identifier", help="UUID или name")

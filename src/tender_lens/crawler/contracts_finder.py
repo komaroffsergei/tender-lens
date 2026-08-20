@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+import logging
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
@@ -10,6 +11,8 @@ from urllib.parse import parse_qs, urlparse
 
 from tender_lens.crawler.base import ResilientHttpClient, SourcePage
 from tender_lens.schemas import AttachmentRecordV1, TenderRecordV1
+
+logger = logging.getLogger(__name__)
 
 
 def _dt(value: Any) -> datetime | None:
@@ -56,7 +59,23 @@ class ContractsFinderAdapter:
             f"{self._base_url}/Published/Notices/OCDS/Search", params=params
         )
         releases = data.get("releases") or []
-        records = [self.map_release(item) for item in releases if isinstance(item, dict)]
+        records: list[TenderRecordV1] = []
+        for index, item in enumerate(releases if isinstance(releases, list) else []):
+            if not isinstance(item, dict):
+                logger.warning(
+                    "Contracts Finder release пропущен: ожидается JSON object",
+                    extra={"item_index": index},
+                )
+                continue
+            try:
+                records.append(self.map_release(item))
+            except (TypeError, ValueError) as exc:
+                # Некорректная release изолируется, остальные элементы страницы сохраняются.
+                logger.warning(
+                    "Contracts Finder release пропущен: %s",
+                    exc,
+                    extra={"item_index": index},
+                )
         return SourcePage(records=records, next_cursor=_next_cursor(data))
 
     @staticmethod
@@ -71,7 +90,9 @@ class ContractsFinderAdapter:
         )
         links = release.get("links") if isinstance(release.get("links"), dict) else {}
 
-        external_id = str(tender.get("id") or release.get("ocid") or release.get("id") or "").strip()
+        external_id = str(
+            tender.get("id") or release.get("ocid") or release.get("id") or ""
+        ).strip()
         title = str(tender.get("title") or release.get("title") or "").strip()
         if not external_id or not title:
             raise ValueError("Contracts Finder release не содержит id/title")

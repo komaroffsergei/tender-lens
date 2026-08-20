@@ -27,8 +27,18 @@ def upgrade() -> None:
         sa.Column("code", sa.String(length=64), nullable=False),
         sa.Column("cursor", sa.Text(), nullable=True),
         sa.Column("last_sync_at", sa.DateTime(timezone=True), nullable=True),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("code"),
     )
@@ -43,7 +53,12 @@ def upgrade() -> None:
         sa.Column("window_started_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("request_count", sa.Integer(), server_default="0", nullable=False),
         sa.Column("last_used_at", sa.DateTime(timezone=True), nullable=True),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.CheckConstraint(
             "limit_per_minute BETWEEN 1 AND 1000", name="ck_api_keys_limit_range"
         ),
@@ -70,8 +85,18 @@ def upgrade() -> None:
         sa.Column("index_status", sa.String(length=16), server_default="pending", nullable=False),
         sa.Column("last_error", sa.Text(), nullable=True),
         sa.Column("raw_payload", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.CheckConstraint("amount IS NULL OR amount >= 0", name="ck_tenders_amount_nonnegative"),
         sa.CheckConstraint(
             "index_status IN ('pending','processing','ready','failed')",
@@ -98,10 +123,25 @@ def upgrade() -> None:
         sa.Column("content_type", sa.Text(), nullable=True),
         sa.Column("sha256", sa.CHAR(length=64), nullable=True),
         sa.Column("size_bytes", sa.BigInteger(), nullable=True),
-        sa.Column("download_status", sa.String(length=16), server_default="pending", nullable=False),
+        sa.Column(
+            "download_status",
+            sa.String(length=16),
+            server_default="pending",
+            nullable=False,
+        ),
         sa.Column("error_message", sa.Text(), nullable=True),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.CheckConstraint("size_bytes IS NULL OR size_bytes >= 0", name="ck_attachment_size"),
         sa.CheckConstraint(
             "download_status IN ('pending','ready','failed','skipped')",
@@ -126,7 +166,12 @@ def upgrade() -> None:
         sa.Column("content_hash", sa.CHAR(length=64), nullable=False),
         sa.Column("embedding", VECTOR(dim=1024), nullable=False),
         sa.Column("embedding_model", sa.String(length=128), nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.CheckConstraint("position >= 0", name="ck_chunks_position"),
         sa.CheckConstraint("length(content) > 0", name="ck_chunks_content"),
         sa.ForeignKeyConstraint(["attachment_id"], ["attachments.id"], ondelete="CASCADE"),

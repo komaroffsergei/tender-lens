@@ -6,6 +6,7 @@ import argparse
 import asyncio
 import json
 import logging
+from dataclasses import asdict
 from pathlib import Path
 
 from tender_lens.config import Settings, get_settings
@@ -83,35 +84,54 @@ async def run(args: argparse.Namespace) -> None:
         while True:
             for source in sources:
                 allowed = _source_hosts(source)
-                async with ResilientHttpClient(
-                    max_concurrency=settings.crawl_max_concurrency,
-                    timeout_seconds=settings.http_timeout_seconds,
-                    max_attempts=settings.http_max_attempts,
-                    base_delay_seconds=settings.http_base_delay_seconds,
-                    jitter_seconds=settings.http_jitter_seconds,
-                    user_agent=settings.user_agent,
-                    allowed_hosts=allowed,
-                ) as source_client, ResilientHttpClient(
-                    max_concurrency=settings.attachment_max_concurrency,
-                    timeout_seconds=settings.http_timeout_seconds,
-                    max_attempts=settings.http_max_attempts,
-                    base_delay_seconds=settings.http_base_delay_seconds,
-                    jitter_seconds=settings.http_jitter_seconds,
-                    user_agent=settings.user_agent,
-                    allowed_hosts=allowed,
-                ) as attachment_client:
-                    service = CrawlerService(
-                        settings=settings,
-                        session_factory=sessions,
-                        attachment_client=attachment_client,
-                        publisher=broker,
+                forbidden_cooldown = (
+                    settings.contracts_finder_cooldown_seconds
+                    if source == "contracts_finder"
+                    else None
+                )
+                try:
+                    async with ResilientHttpClient(
+                        max_concurrency=settings.crawl_max_concurrency,
+                        timeout_seconds=settings.http_timeout_seconds,
+                        max_attempts=settings.http_max_attempts,
+                        base_delay_seconds=settings.http_base_delay_seconds,
+                        jitter_seconds=settings.http_jitter_seconds,
+                        user_agent=settings.user_agent,
+                        allowed_hosts=allowed,
+                        forbidden_cooldown_seconds=forbidden_cooldown,
+                    ) as source_client, ResilientHttpClient(
+                        max_concurrency=settings.attachment_max_concurrency,
+                        timeout_seconds=settings.http_timeout_seconds,
+                        max_attempts=settings.http_max_attempts,
+                        base_delay_seconds=settings.http_base_delay_seconds,
+                        jitter_seconds=settings.http_jitter_seconds,
+                        user_agent=settings.user_agent,
+                        allowed_hosts=allowed,
+                        forbidden_cooldown_seconds=forbidden_cooldown,
+                    ) as attachment_client:
+                        service = CrawlerService(
+                            settings=settings,
+                            session_factory=sessions,
+                            attachment_client=attachment_client,
+                            publisher=broker,
+                        )
+                        await service.republish_pending()
+                        summary = await service.run_source(
+                            _adapter(source, settings, source_client, args.fixture),
+                            max_items=max_items,
+                        )
+                        logger.info(
+                            "Crawl завершён: %s",
+                            json.dumps(asdict(summary), default=str),
+                        )
+                except asyncio.CancelledError:
+                    raise
+                except Exception:
+                    # Сбой одного внешнего источника не должен останавливать остальные.
+                    logger.exception(
+                        "Crawl источника завершился ошибкой",
+                        extra={"source": source},
                     )
-                    await service.republish_pending()
-                    summary = await service.run_source(
-                        _adapter(source, settings, source_client, args.fixture),
-                        max_items=max_items,
-                    )
-                    logger.info("Crawl завершён: %s", json.dumps(summary.__dict__, default=str))
             if args.once or args.fixture:
                 return
             await asyncio.sleep(settings.crawl_interval_seconds)

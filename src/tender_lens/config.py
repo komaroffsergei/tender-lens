@@ -31,7 +31,8 @@ class Settings(BaseSettings):
 
     ai_mode: Literal["live", "fake"] = "fake"
     embedding_model: str = "qwen3-embedding:0.6b"
-    embedding_dimensions: int = Field(default=1024, ge=8, le=8192)
+    # Размерность зафиксирована схемой PostgreSQL VECTOR(1024).
+    embedding_dimensions: Literal[1024] = 1024
     generation_model: str = "qwen3:1.7b"
 
     attachments_dir: Path = Path("./data/attachments")
@@ -53,7 +54,7 @@ class Settings(BaseSettings):
     api_port: int = Field(default=8000, ge=1, le=65535)
 
     ted_base_url: str = "https://api.ted.europa.eu"
-    ted_query: str = "competition-status = active"
+    ted_query: str = "notice-type = cn-standard SORT BY publication-date DESC"
     ted_page_size: int = Field(default=20, ge=1, le=250)
 
     contracts_finder_base_url: str = "https://www.contractsfinder.service.gov.uk"

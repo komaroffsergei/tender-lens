@@ -8,7 +8,6 @@ from dataclasses import dataclass, field
 
 from fastapi import Header, Request
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from tender_lens.errors import AppError
 from tender_lens.models import ApiKey

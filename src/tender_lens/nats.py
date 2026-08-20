@@ -89,7 +89,12 @@ class NatsBroker:
         except Exception as exc:
             raise DependencyUnavailableError("Не удалось опубликовать NATS event.") from exc
 
-    async def iter_messages(self, *, batch: int = 1, timeout: float = 1.0) -> AsyncIterator[NatsMessage]:
+    async def iter_messages(
+        self,
+        *,
+        batch: int = 1,
+        timeout: float = 1.0,
+    ) -> AsyncIterator[NatsMessage]:
         if self._js is None:
             raise RuntimeError("NATS connection не инициализирован")
         try:

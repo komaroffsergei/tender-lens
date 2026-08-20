@@ -32,7 +32,10 @@ class SearchService:
                 s.code AS source,
                 t.source_url,
                 c.content AS snippet,
-                GREATEST(-1.0, LEAST(1.0, 1 - (c.embedding <=> CAST(:embedding AS vector)))) AS score,
+                GREATEST(
+                    -1.0,
+                    LEAST(1.0, 1 - (c.embedding <=> CAST(:embedding AS vector)))
+                ) AS score,
                 a.id AS attachment_id,
                 a.filename AS attachment_filename
             FROM chunks c
@@ -86,7 +89,11 @@ class SearchService:
 class InMemorySearchService:
     """Упрощённая реализация для HTTP-тестов без PostgreSQL."""
 
-    def __init__(self, items: list[SearchResult] | None = None, answer: str = "Тестовый ответ") -> None:
+    def __init__(
+        self,
+        items: list[SearchResult] | None = None,
+        answer: str = "Тестовый ответ",
+    ) -> None:
         self.items = items or []
         self.answer_text = answer
 

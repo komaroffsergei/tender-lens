@@ -70,12 +70,24 @@ function updateRate(response) {
 }
 
 async function parseError(response) {
+  const defaults = {
+    401: "API-ключ отсутствует или имеет неверный формат.",
+    403: "API-ключ отключён или не найден.",
+    429: "Лимит запросов исчерпан.",
+    503: "Сервис временно не готов к поиску.",
+  };
+  let message = defaults[response.status] || `HTTP ${response.status}`;
   try {
     const payload = await response.json();
-    return payload.error?.message || `HTTP ${response.status}`;
+    message = payload.error?.message || message;
   } catch (_) {
-    return `HTTP ${response.status}`;
+    // Тело ошибки не обязано быть JSON; сохраняем понятное сообщение по HTTP-коду.
   }
+  const retryAfter = response.headers.get("Retry-After");
+  if (response.status === 429 && retryAfter) {
+    message += ` Повторите через ${retryAfter} сек.`;
+  }
+  return message;
 }
 
 async function submitQuery() {

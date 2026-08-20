@@ -6,7 +6,6 @@ import logging
 from dataclasses import dataclass
 from uuid import UUID
 
-import sqlalchemy as sa
 from sqlalchemy import delete, select
 from sqlalchemy.orm import selectinload
 
@@ -66,7 +65,7 @@ class IndexerService:
         if tender.content_hash != event.content_hash:
             return IndexResult(tender.id, "stale", 0, [])
         if tender.indexed_hash == event.content_hash and tender.index_status == "ready":
-            return IndexResult(tender.id, "unchanged", len(tender.chunks), [])
+            return IndexResult(tender.id, "unchanged", 0, [])
 
         async with self._session_factory() as session:
             locked = await session.get(Tender, tender.id, with_for_update=True)
