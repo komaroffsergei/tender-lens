@@ -11,9 +11,10 @@
 | `docker-compose.test.yml` | локальная PostgreSQL/NATS test infra |
 | `alembic.ini`, `migrations/` | схема PostgreSQL/pgvector |
 | `.github/workflows/ci.yml` | quality, integration и container jobs |
-| `scripts/` | fixture demo, live smoke, JSON Schema export |
+| `scripts/` | fixture demo, live smoke, JSON Schema export и release packager |
 | `schemas/` | проверяемые wire contracts |
 | `examples/fixtures/` | детерминированные TED/CF/PDF/XML/HTML/TXT fixtures |
+| `docs/reports/` | фактическая локальная верификация и ограничения среды |
 
 ## Python package
 

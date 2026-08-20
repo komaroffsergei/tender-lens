@@ -18,9 +18,10 @@
 85d113b feat(stage-05-06): implement asynchronous source adapters and attachment ingestion
 bb5e927 feat(stage-07-09): add JetStream indexing, embeddings and exact vector search
 ec8d5cb feat(stage-11-14): expose protected API, rate limiter, demo CLI and static UI
+24c0cf9 test(stage-15): complete regression suite, CI and delivery documentation
 ```
 
-Финальные regression tests, документация, merge commit и tag добавляются в текущую поставку.
+Финальные regression tests и документация зафиксированы в feature branch; merge commit и tag создаются перед упаковкой.
 
 ## Проверяемые ограничения среды сборки архива
 
