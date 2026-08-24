@@ -1,6 +1,6 @@
 # Контракт локального fixture server для e2e
 
-Codex может реализовать fixture server как маленькое FastAPI-приложение внутри tests или как pytest HTTP server fixture. Он не является production-сервисом и не попадает в основной Compose.
+Fixture server может быть маленьким FastAPI-приложением внутри tests или pytest HTTP server fixture. Он не является production-сервисом и не входит в основной Compose.
 
 ## Endpoints
 

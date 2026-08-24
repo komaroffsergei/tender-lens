@@ -1,4 +1,4 @@
--- Эталон смысла запроса. Codex адаптирует синтаксис параметров под SQLAlchemy.
+-- Эталон exact cosine запроса; production-версия параметризована через SQLAlchemy.
 SELECT
     c.id AS chunk_id,
     c.tender_id,

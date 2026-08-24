@@ -94,7 +94,7 @@ def create_app(
 
     application = FastAPI(
         title="TenderLens API",
-        version="0.1.0",
+        version="0.2.0",
         description="Поиск и grounded RAG по открытым закупкам.",
         lifespan=lifespan,
     )

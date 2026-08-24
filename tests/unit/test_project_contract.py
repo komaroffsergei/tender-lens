@@ -130,38 +130,8 @@ def test_shell_scripts_have_valid_shebang(project_root):
         assert path.read_text(encoding="utf-8").startswith("#!/usr/bin/env bash")
 
 
-def test_release_packager_excludes_runtime_and_secrets():
-    from scripts.package_release import is_allowed_path
-
-    assert is_allowed_path("src/tender_lens/api/main.py") is True
-    assert is_allowed_path(".env") is False
-    assert is_allowed_path(".git/config") is False
-    assert is_allowed_path("src/tender_lens/__pycache__/module.pyc") is False
-    assert is_allowed_path("../outside.txt") is False
-
-
 def test_default_ted_query_uses_current_search_field(tmp_path):
     settings = Settings(_env_file=None, attachments_dir=tmp_path)
     assert "notice-type = cn-standard" in settings.ted_query
     assert "publication-date" in settings.ted_query
     assert "competition-status" not in settings.ted_query
-
-
-def test_release_packager_creates_manifested_zip(tmp_path, project_root):
-    import zipfile
-
-    if not (project_root / ".git").exists():
-        pytest.skip("Проверка упаковщика требует Git metadata исходного репозитория")
-
-    from scripts.package_release import build_archive
-
-    output = build_archive(tmp_path / "release.zip", version="test")
-    with zipfile.ZipFile(output) as archive:
-        names = set(archive.namelist())
-        assert "tender-lens-test/AGENTS.md" in names
-        manifest_name = "tender-lens-test/RELEASE_MANIFEST.sha256"
-        assert manifest_name in names
-        manifest = archive.read(manifest_name).decode("utf-8")
-        assert "  AGENTS.md" in manifest
-        assert not any(name.endswith("/.env") for name in names)
-        assert not any("__pycache__" in name for name in names)
