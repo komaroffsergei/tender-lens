@@ -188,9 +188,7 @@ class Chunk(Base):
 class ApiKey(Base):
     __tablename__ = "api_keys"
     __table_args__ = (
-        sa.CheckConstraint(
-            "limit_per_minute BETWEEN 1 AND 1000", name="ck_api_keys_limit_range"
-        ),
+        sa.CheckConstraint("limit_per_minute BETWEEN 1 AND 1000", name="ck_api_keys_limit_range"),
         sa.CheckConstraint("request_count >= 0", name="ck_api_keys_request_count"),
     )
 

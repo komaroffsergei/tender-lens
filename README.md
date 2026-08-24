@@ -1,83 +1,82 @@
 # TenderLens
 
-Асинхронный мониторинг открытых закупок с фоновой индексацией через NATS JetStream, хранением embeddings в PostgreSQL/pgvector и локальным grounded RAG через Ollama.
+[![CI](https://github.com/komaroffsergei/tender-lens/actions/workflows/ci.yml/badge.svg)](https://github.com/komaroffsergei/tender-lens/actions/workflows/ci.yml)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+Асинхронный сервис мониторинга открытых закупок на Python. Основное тестовое задание — **№7: асинхронный парсер/скрапер сайтов**. Сервис получает закупки из TED и UK Contracts Finder, скачивает вложения и сохраняет нормализованные метаданные в PostgreSQL.
+
+RAG-поиск, API rate limiter и контейнеризация — дополнительные возможности, демонстрирующие части заданий №3, №8 и №9. Проект не заявляет выполнение остальных заданий вакансии.
 
 ![Архитектура TenderLens](docs/diagrams/architecture.png)
 
-## Что реализовано
+## Соответствие заданию №7
 
-Основное тестовое задание проекта — **№7, асинхронный парсер/скрапер закупок**. Решение дополнено практическими частями заданий №3, №8 и №9:
+- два открытых источника: TED Search API и Contracts Finder OCDS Search API;
+- `asyncio` и `httpx` с ограниченной конкурентностью;
+- базовая задержка с jitter, timeout, retry и поддержка `Retry-After`;
+- ручная проверка каждого redirect и закрытый allowlist официальных host;
+- потоковая загрузка вложений с ограничением размера;
+- безопасные имена файлов, атомарная запись и SHA-256;
+- PostgreSQL, идемпотентный UPSERT и cursor источника;
+- ошибка одной записи, вложения или источника не останавливает остальные;
+- fixture-тесты не зависят от доступности внешних сайтов.
 
-- два адаптера источников: TED и UK Contracts Finder;
-- асинхронный `httpx`-клиент с лимитом конкурентности, задержкой, jitter, retry, `Retry-After` и запретом redirect на неизвестный host;
-- нормализация обоих источников в единый Pydantic-контракт `TenderRecordV1`;
-- инкрементальный `UPSERT` закупок в PostgreSQL и детерминированный `content_hash`;
-- потоковое скачивание вложений с лимитом размера, безопасным именем и SHA-256;
-- одно долговечное событие `tender.changed.v1` в NATS JetStream;
-- извлечение текста из PDF/XML/HTML/JSON/TXT, чанкинг и batch embeddings;
-- точный cosine search через `pgvector`;
-- grounded `/ask`, который генерирует ответ только по найденным фрагментам;
-- API-key аутентификация и общий PostgreSQL fixed-window limiter для `/search` и `/ask`;
-- статический адаптивный UI без npm, CDN и frontend-фреймворков;
-- Docker Compose, Alembic, GitHub Actions, unit/API/integration/E2E-тесты;
-- MIT License.
+Параллельность реализована асинхронными задачами внутри одного процесса. Это позволяет одновременно обрабатывать сетевые операции без создания OS-потока на каждый запрос.
 
-Проект намеренно не изображает распределённую империю из десятка пустых сервисов. Один Python package запускается в трёх ролях: `crawler`, `indexer`, `api`.
+## Архитектура
 
-## Архитектура в одной схеме
+Один Python-пакет и Docker image запускаются в трёх ролях:
 
 ```text
 TED / Contracts Finder
           │
           ▼
-      crawler
-  httpx + adapters
-  PostgreSQL + files
+       crawler ──► PostgreSQL + attachment volume
           │
           ▼
- NATS JetStream
- tender.changed.v1
+ NATS JetStream: tender.changed.v1
           │
           ▼
-       indexer
- extract → chunk → embed
-          │
-          ▼
- PostgreSQL + pgvector
-          ▲
-          │
- Browser → FastAPI → search / grounded RAG → Ollama
+       indexer ──► PostgreSQL / pgvector
+                          ▲
+                          │
+ Browser ──► FastAPI ──► Search / grounded RAG
 ```
 
-Подробности: [`docs/architecture.md`](docs/architecture.md), [`docs/algorithm.md`](docs/algorithm.md).
+Состав Compose:
 
-## Состав контейнеров
-
-| Контейнер | Назначение |
+| Сервис | Назначение |
 |---|---|
-| `postgres` | метаданные, API-ключи, chunks и `VECTOR(1024)` |
-| `nats` | долговечная очередь фоновой индексации |
-| `migrate` | одноразовый `alembic upgrade head` |
-| `crawler` | TED/Contracts Finder, вложения, NATS publish |
-| `indexer` | durable consumer, extraction, embeddings, index update |
-| `api` | REST API, UI, auth, limiter, search и RAG |
-| `ollama` | опциональный профиль `ai` для реальных моделей |
-| `model-init` | опциональная загрузка моделей Ollama |
+| `postgres` | Метаданные, API-ключи и `VECTOR(1024)` |
+| `nats` | Durable очередь фоновой индексации |
+| `migrate` | Применение Alembic migration |
+| `crawler` | Источники, вложения, UPSERT и публикация события |
+| `indexer` | Извлечение текста, embeddings и pgvector |
+| `api` | FastAPI, UI, auth, limiter, Search и Ask |
+| `ollama` | Опциональный локальный AI-профиль |
 
-`crawler`, `indexer`, `api` и `migrate` используют **один Docker image**.
+Подробности: [архитектура](docs/architecture.md) и [алгоритмы](docs/algorithm.md).
 
-## Быстрый запуск: детерминированный fake AI
+## Быстрый запуск
 
-Требуются Docker Engine, Docker Compose v2 и `curl`.
+Требуются Docker Engine и Docker Compose.
 
 ```bash
 cp .env.example .env
 docker compose up --build -d
 ```
 
-По умолчанию `AI_MODE=fake`: embeddings и ответы детерминированы, поэтому систему можно проверить без загрузки моделей.
+Для PowerShell:
 
-Создание API-ключа:
+```powershell
+Copy-Item .env.example .env
+docker compose up --build -d
+```
+
+По умолчанию используется `AI_MODE=fake`: модель не скачивается, embeddings и ответы детерминированы.
+
+Создать API-ключ:
 
 ```bash
 docker compose run --rm api \
@@ -86,47 +85,20 @@ docker compose run --rm api \
 
 Открыть:
 
-- UI: `http://localhost:8000`
-- OpenAPI: `http://localhost:8000/docs`
-- readiness: `http://localhost:8000/health/ready`
-- NATS monitoring: `http://localhost:8222`
+- UI: <http://localhost:8000>
+- OpenAPI: <http://localhost:8000/docs>
+- readiness: <http://localhost:8000/health/ready>
+- NATS monitoring: <http://localhost:8222>
 
-## Полный fixture-demo
-
-Команда поднимает PostgreSQL/NATS/API/indexer, загружает две fixture-закупки, индексирует их, выполняет Search, Ask и проверяет, что шестой общий запрос получает `429`:
+Остановить сервисы:
 
 ```bash
-make demo-fake
+docker compose down
 ```
 
-Сценарий не обращается к TED, Contracts Finder или Ollama.
+## Демонстрация crawler
 
-## Реальный локальный AI через Ollama
-
-В `.env` установить:
-
-```dotenv
-AI_MODE=live
-```
-
-Затем:
-
-```bash
-docker compose --profile ai up --build -d
-```
-
-Профиль `ai` запускает Ollama и одноразовый `model-init`, который загружает:
-
-```text
-qwen3-embedding:0.6b
-qwen3:1.7b
-```
-
-Размер embedding зафиксирован контрактом и миграцией: `1024`.
-
-## Одноразовый crawl
-
-TED:
+Одноразово получить до пяти записей TED:
 
 ```bash
 docker compose run --rm crawler \
@@ -140,84 +112,72 @@ docker compose run --rm crawler \
   python -m tender_lens.crawler --once --source contracts_finder --max-items 5
 ```
 
-Оба источника:
+Детерминированный fixture-demo полного конвейера:
 
 ```bash
-docker compose run --rm crawler \
-  python -m tender_lens.crawler --once --source all --max-items 5
+make demo-fake
 ```
 
-Crawler не обходит CAPTCHA, авторизацию или технические запреты. Реализованы только базовые задержки, ограничение конкурентности и корректная обработка временных ошибок.
+Сценарий загружает две локальные fixture-закупки, индексирует их, выполняет Search и Ask и проверяет ответ 429 на шестой запрос.
+
+Crawler не обходит CAPTCHA, авторизацию или технические ограничения. Он использует только открытые API и вежливую сетевую политику.
 
 ## API
 
-Все пользовательские endpoints требуют `X-API-Key`.
-
-### Поиск
+Все прикладные endpoints требуют `X-API-Key`.
 
 ```bash
-curl -sS http://localhost:8000/api/v1/search \
-  -H 'Content-Type: application/json' \
-  -H 'X-API-Key: tl_...' \
+curl http://localhost:8000/api/v1/search \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: tl_..." \
   -d '{"query":"server storage warranty","limit":5}'
 ```
 
-### Grounded RAG
-
 ```bash
-curl -sS http://localhost:8000/api/v1/ask \
-  -H 'Content-Type: application/json' \
-  -H 'X-API-Key: tl_...' \
+curl http://localhost:8000/api/v1/ask \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: tl_..." \
   -d '{"query":"Какие серверы и гарантии требуются?","limit":5}'
 ```
 
-### Карточка закупки
+- `/search` принимает `limit` от 1 до 10.
+- `/ask` использует не более пяти источников.
+- Результаты с cosine similarity ниже `MIN_RELEVANCE_SCORE` не возвращаются.
+- При отсутствии релевантного контекста LLM не вызывается.
+- Один API-ключ может выполнить пять общих запросов Search/Ask за UTC-минуту.
+- `Retry-After` возвращается только с HTTP 429.
+
+Примеры контрактов: [docs/api-examples.md](docs/api-examples.md).
+
+## Реальный Ollama
+
+В `.env`:
+
+```dotenv
+AI_MODE=live
+```
+
+Запуск:
 
 ```bash
-curl -sS http://localhost:8000/api/v1/tenders/<UUID> \
-  -H 'X-API-Key: tl_...'
+docker compose --profile ai up --build -d
 ```
 
-Rate-limit headers:
+Профиль загружает `qwen3-embedding:0.6b` и `qwen3:1.7b`. Размерность embedding зафиксирована миграцией как 1024.
 
-```text
-X-RateLimit-Limit
-X-RateLimit-Remaining
-X-RateLimit-Reset
-Retry-After
-```
+## Проверки
 
-Подробнее: [`docs/api-examples.md`](docs/api-examples.md).
-
-## CLI
-
-```bash
-python -m tender_lens.cli create-api-key --name demo --limit 5
-python -m tender_lens.cli list-api-keys
-python -m tender_lens.cli disable-api-key demo
-python -m tender_lens.cli seed-demo --fixture-dir examples/fixtures
-```
-
-Открытое значение API-ключа показывается один раз. В базе хранится только SHA-256.
-
-## Локальная разработка
-
-Python 3.12+:
+Локальные проверки Python:
 
 ```bash
 python -m pip install -r requirements-dev.lock
-cp .env.example .env
+python -m black --check src tests migrations
+python -m flake8 src tests
+python -m mypy src
+python -m pytest -q tests/unit tests/api
 ```
 
-Проверки без инфраструктуры:
-
-```bash
-make lint
-make typecheck
-make test-unit
-```
-
-Интеграционные тесты требуют PostgreSQL с `pgvector` и NATS. Канонический вариант:
+Интеграционные и E2E-тесты:
 
 ```bash
 docker compose -f docker-compose.test.yml up -d
@@ -226,63 +186,30 @@ DATABASE_URL=postgresql+asyncpg://tender_lens:tender_lens@localhost:55432/tender
 RUN_INTEGRATION=1 \
 TEST_DATABASE_URL=postgresql+asyncpg://tender_lens:tender_lens@localhost:55432/tender_lens_test \
 TEST_NATS_URL=nats://localhost:54222 \
-  python -m pytest -q tests/integration tests/e2e
+  python -m pytest -q
 ```
 
-## CI/CD
+GitHub Actions проверяет Black, Flake8, MyPy, unit/API, PostgreSQL/pgvector, настоящий NATS, полный fixture E2E, downgrade/upgrade migration, Docker build, Compose config и запуск всех трёх ролей. Live API и Ollama не входят в обязательный CI.
 
-`.github/workflows/ci.yml` запускается на push и pull request:
+## Ограничения
 
-1. `black --check`;
-2. `flake8`;
-3. unit/API tests;
-4. PostgreSQL/pgvector migration;
-5. NATS integration tests;
-6. fixture E2E;
-7. Docker build;
-8. `docker compose config`.
-
-`mypy` оставлен отдельной локальной проверкой (`make typecheck`), но не блокирует обязательный CI: формальное требование тестового задания относится к `black` и `flake8`.
-
-CI не обращается к live-источникам и не загружает Ollama-модели. Люди иногда называют сетевую случайность тестированием, но здесь решено не участвовать в этом обряде.
-
-## Ограничения MVP
-
-- PDF индексируется только при наличии текстового слоя; OCR отсутствует.
-- DOC/DOCX/XLS/XLSX/архивы сохраняются, но не индексируются.
-- Поиск только semantic, без PostgreSQL FTS/RRF/reranker.
-- Exact vector scan без HNSW/IVFFlat подходит для небольшого демонстрационного корпуса.
-- Fixed UTC-minute limiter допускает burst на границе двух минут.
-- Общие PostgreSQL и Docker volume сознательно упрощают развёртывание на одном host.
-- Изменение содержимого файла по прежнему URL обнаруживается только при изменении метаданных закупки или повторной неуспешной загрузке.
-
-Обоснование: [`docs/tradeoffs.md`](docs/tradeoffs.md).
+- PDF без текстового слоя требует OCR, которого в MVP нет.
+- DOCX/XLSX и архивы скачиваются, но не индексируются.
+- Векторный поиск использует exact scan без HNSW/IVFFlat и рассчитан на демонстрационный объём.
+- Fixed-window limiter допускает burst на границе двух минут.
+- Live-smoke внешних API выполняется отдельно и может зависеть от доступности источника.
 
 ## Документация
 
+- [Логика и алгоритмы](docs/algorithm.md)
 - [Архитектура](docs/architecture.md)
-- [Алгоритмы](docs/algorithm.md)
-- [API и примеры](docs/api-examples.md)
 - [Тестирование](docs/testing.md)
 - [Эксплуатация](docs/operations.md)
-- [Code map](docs/code-map.md)
-- [Traceability](docs/traceability.md)
+- [Traceability задания](docs/traceability.md)
+- [Карта кода](docs/code-map.md)
 - [Компромиссы](docs/tradeoffs.md)
-- [Решения](docs/decisions.md)
-- [Отчёт о поставке](docs/final-report.md)
-- [Шпаргалка к собеседованию](docs/INTERVIEW_CHEATSHEET.md)
-
-## Git-процесс
-
-В архиве сохранена история Git:
-
-- спецификации и исходные материалы инициализированы в `main`;
-- реализация выполнена в `feature/tender-lens`;
-- изменения разбиты на содержательные commits;
-- финальная версия сливается merge commit-ом и помечается `v0.1.0`.
-
-Для переноса истории отдельно поставляется Git bundle.
+- [Безопасность](SECURITY.md)
 
 ## License
 
-MIT, см. [`LICENSE`](LICENSE).
+Проект распространяется по лицензии [MIT](LICENSE).

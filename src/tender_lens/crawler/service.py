@@ -25,8 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 class EventPublisher(Protocol):
-    async def publish_tender_changed(self, event: TenderChangedV1) -> str:
-        ...
+    async def publish_tender_changed(self, event: TenderChangedV1) -> str: ...
 
 
 @dataclass(frozen=True, slots=True)
@@ -135,9 +134,9 @@ class CrawlerService:
             attachment_ids: list[UUID] = []
             for item in record.attachments:
                 url = str(item.source_url)
-                attachment = existing.get(url)
-                if attachment is None:
-                    attachment = Attachment(
+                current_attachment = existing.get(url)
+                if current_attachment is None:
+                    current_attachment = Attachment(
                         tender_id=tender.id,
                         external_id=item.external_id,
                         title=item.title,
@@ -146,16 +145,18 @@ class CrawlerService:
                         content_type=item.content_type,
                         download_status="pending",
                     )
-                    session.add(attachment)
+                    session.add(current_attachment)
                     await session.flush()
                 else:
-                    attachment.external_id = item.external_id
-                    attachment.title = item.title
-                    attachment.filename = item.filename
-                    attachment.content_type = item.content_type or attachment.content_type
-                    if attachment.download_status == "skipped":
-                        attachment.download_status = "pending"
-                attachment_ids.append(attachment.id)
+                    current_attachment.external_id = item.external_id
+                    current_attachment.title = item.title
+                    current_attachment.filename = item.filename
+                    current_attachment.content_type = (
+                        item.content_type or current_attachment.content_type
+                    )
+                    if current_attachment.download_status == "skipped":
+                        current_attachment.download_status = "pending"
+                attachment_ids.append(current_attachment.id)
 
             await session.commit()
             return PersistedTender(tender.id, content_hash, changed, attachment_ids)

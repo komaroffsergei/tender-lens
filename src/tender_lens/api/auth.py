@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import secrets
+from typing import cast
 from dataclasses import dataclass, field
 
 from fastapi import Header, Request
@@ -43,7 +44,10 @@ async def authenticate_api_key(
     key_hash = hash_api_key(x_api_key)
     factory = request.app.state.session_factory
     async with factory() as session:
-        api_key = await session.scalar(select(ApiKey).where(ApiKey.key_hash == key_hash))
+        api_key = cast(
+            ApiKey | None,
+            await session.scalar(select(ApiKey).where(ApiKey.key_hash == key_hash)),
+        )
         if api_key is None:
             raise AppError("api_key_invalid", "API-ключ не найден.", 401)
         if api_key.enabled is False:

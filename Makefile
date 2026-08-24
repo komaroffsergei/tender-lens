@@ -1,7 +1,7 @@
 PYTHON ?= python
 COMPOSE ?= docker compose
 
-.PHONY: install format lint typecheck test-unit test-integration test-e2e test ci migrate compose-up compose-down demo-fake live-smoke package
+.PHONY: install format lint typecheck test-unit test-integration test-e2e test ci migrate compose-up compose-down demo-fake live-smoke
 
 install:
 	$(PYTHON) -m pip install -r requirements-dev.lock
@@ -43,6 +43,3 @@ demo-fake:
 
 live-smoke:
 	bash scripts/live_smoke.sh
-
-package:
-	PYTHONPATH=src $(PYTHON) scripts/package_release.py

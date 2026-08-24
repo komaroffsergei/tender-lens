@@ -69,9 +69,7 @@ async def test_http_concurrency_is_bounded():
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as raw:
         client = make_client(raw, max_concurrency=2, attempts=1)
-        await asyncio.gather(
-            *(client.get_json("https://example.test/data") for _ in range(8))
-        )
+        await asyncio.gather(*(client.get_json("https://example.test/data") for _ in range(8)))
     assert maximum <= 2
 
 
@@ -249,9 +247,62 @@ async def test_redirect_to_allowed_host_is_followed():
         return httpx.Response(200, json={"ok": True})
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as raw:
-        result = await make_client(raw, attempts=2).get_json(
-            "https://example.test/start"
-        )
+        result = await make_client(raw, attempts=2).get_json("https://example.test/start")
 
     assert result == {"ok": True}
     assert paths == ["/start", "/final"]
+
+
+@pytest.mark.asyncio
+async def test_redirects_do_not_consume_retry_attempts():
+    paths = []
+
+    async def handler(request):
+        paths.append(request.url.path)
+        redirects = {"/one": "/two", "/two": "/three", "/three": "/final"}
+        if request.url.path in redirects:
+            return httpx.Response(302, headers={"Location": redirects[request.url.path]})
+        return httpx.Response(200, json={"ok": True})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as raw:
+        result = await make_client(raw, attempts=1).get_json("https://example.test/one")
+
+    assert result == {"ok": True}
+    assert paths == ["/one", "/two", "/three", "/final"]
+
+
+@pytest.mark.asyncio
+async def test_stream_redirects_do_not_consume_retry_attempts(tmp_path):
+    paths = []
+
+    async def handler(request):
+        paths.append(request.url.path)
+        redirects = {"/one": "/two", "/two": "/three", "/three": "/final"}
+        if request.url.path in redirects:
+            return httpx.Response(302, headers={"Location": redirects[request.url.path]})
+        return httpx.Response(200, content=b"document")
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as raw:
+        result = await download_attachment(
+            client=make_client(raw, attempts=1),
+            url="https://example.test/one",
+            root=tmp_path,
+            tender_id=UUID(int=1),
+            attachment_id=UUID(int=2),
+            filename="document.bin",
+            max_bytes=1024,
+        )
+
+    assert Path(result.local_path).read_bytes() == b"document"
+    assert paths == ["/one", "/two", "/three", "/final"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("url", ["http://localhost/file", "http://127.0.0.1/file"])
+async def test_local_redirect_targets_are_rejected(url):
+    async def handler(request):
+        return httpx.Response(302, headers={"Location": url})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as raw:
+        with pytest.raises(SourceRequestError, match="Локальн"):
+            await make_client(raw, attempts=1).get_json("https://example.test/start")

@@ -16,8 +16,9 @@ def vector_literal(vector: list[float]) -> str:
 
 
 class SearchService:
-    def __init__(self, ai: AIProvider) -> None:
+    def __init__(self, ai: AIProvider, min_relevance_score: float = 0.20) -> None:
         self._ai = ai
+        self._min_relevance_score = min_relevance_score
 
     async def search(self, session: AsyncSession, query: str, limit: int) -> SearchResponse:
         vectors = await self._ai.embed([query])
@@ -43,6 +44,7 @@ class SearchService:
             JOIN sources s ON s.id = t.source_id
             LEFT JOIN attachments a ON a.id = c.attachment_id
             WHERE t.index_status = 'ready'
+              AND (1 - (c.embedding <=> CAST(:embedding AS vector))) >= :min_score
             ORDER BY c.embedding <=> CAST(:embedding AS vector), c.id
             LIMIT :limit
             """
@@ -50,7 +52,11 @@ class SearchService:
         rows = (
             await session.execute(
                 sql,
-                {"embedding": vector_literal(vectors[0]), "limit": limit},
+                {
+                    "embedding": vector_literal(vectors[0]),
+                    "limit": limit,
+                    "min_score": self._min_relevance_score,
+                },
             )
         ).mappings()
         items: list[SearchResult] = []
@@ -78,7 +84,7 @@ class SearchService:
         search = await self.search(session, query, limit)
         if not search.items:
             return AskResponse(
-                answer="Данных недостаточно для ответа по загруженной базе закупок.",
+                answer="Недостаточно данных в базе знаний.",
                 sources=[],
             )
         system, prompt = build_rag_prompt(query, search.items)

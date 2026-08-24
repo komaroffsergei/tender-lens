@@ -82,6 +82,8 @@ Consumer: INDEXER
 Storage: file
 Delivery: pull
 ACK: explicit
+ACK wait: 300 seconds
+Max delivery: 5
 Semantics: at least once
 ```
 
@@ -117,6 +119,7 @@ Crawler пишет в `/data/attachments`, indexer читает тот же volu
 | indexer упал до commit | нет ACK, JetStream redelivery |
 | indexer упал после commit до ACK | `indexed_hash == event.content_hash` |
 | пришло старое событие | сравнение event hash с текущим `content_hash` |
+| старая попытка завершилась ошибкой после обновления tender | failed записывается только при совпадении `content_hash` |
 | reindex упал | старые chunks удаляются только внутри финальной транзакции |
 
 ## Границы доверия

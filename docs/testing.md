@@ -1,69 +1,46 @@
-# Тестирование TenderLens
+# Тестирование
 
 ## Уровни
 
-### Unit
+### Unit и API
 
-Не используют внешнюю сеть, PostgreSQL, NATS или Ollama. `httpx.MockTransport`, fake sessions и `FakeAIProvider` проверяют:
+Не используют внешнюю сеть, PostgreSQL, NATS или Ollama. Проверяются:
 
-- Pydantic contracts и JSON Schema drift;
-- hashing;
-- два source adapters;
-- malformed record isolation;
-- concurrency, retry, cooldown и redirect policy;
-- безопасную загрузку файлов;
-- extraction и chunking;
-- Ollama HTTP contract;
-- prompt-injection boundary;
-- API-key и rate limiter state machine;
-- static UI security checks.
+- контракты Pydantic и отсутствие JSON Schema drift;
+- TED и Contracts Finder на сохранённых fixtures;
+- bounded concurrency, retry, redirect и SSRF policy;
+- потоковая загрузка и ограничения файлов;
+- extraction, chunking и fake/live AI HTTP-контракт;
+- FastAPI auth, validation, rate-limit headers и безопасные ошибки;
+- статические HTML/CSS/JS assets.
 
 ```bash
-make test-unit
+python -m pytest -q tests/unit tests/api
 ```
-
-### API
-
-FastAPI запускается in-process с fake session/search/AI. Проверяются:
-
-- health;
-- auth 401/403;
-- sanitized tender details;
-- validation errors;
-- Search/Ask contracts;
-- shared rate limit и 429 headers;
-- stable 500/503;
-- static UI/assets.
 
 ### Integration
 
-Требуются настоящий PostgreSQL/pgvector и NATS JetStream:
+Используются настоящие PostgreSQL/pgvector и NATS JetStream:
 
-- migration и vector extension;
-- upsert/unique constraints;
-- exact vector query;
-- idempotent/stale indexing;
-- concurrent row-lock limiter;
-- JetStream create/publish/consume/ACK.
+- схема и extension `vector`;
+- UPSERT, source isolation, cursor и pending republish;
+- идемпотентная индексация и защита от stale event;
+- relevance threshold и отсутствие generation без контекста;
+- атомарный rate limiter;
+- durable consumer с `ack_wait=300` и `max_deliver=5`.
 
 ### E2E
 
-Fixture source → PostgreSQL → attachment volume → event → indexer → pgvector → Search/Ask.
+Детерминированный сценарий выполняет цепочку:
 
-Live source и real Ollama имеют отдельную ручную политику и не входят в CI.
-
-## Команды
-
-```bash
-make format
-make lint
-make typecheck
-make test-unit
-make test-integration
-make test-e2e
+```text
+fixture source → crawler → attachment → PostgreSQL → NATS
+→ indexer → pgvector → protected Search/Ask → 429
 ```
 
-Полный инфраструктурный запуск:
+Один из E2E-тестов использует настоящий NATS, а не in-memory broker.
+
+## Локальный инфраструктурный прогон
 
 ```bash
 docker compose -f docker-compose.test.yml up -d
@@ -72,27 +49,16 @@ python -m alembic upgrade head
 RUN_INTEGRATION=1 \
 TEST_DATABASE_URL="$DATABASE_URL" \
 TEST_NATS_URL=nats://localhost:54222 \
-python -m pytest -q tests/integration tests/e2e
+python -m pytest -q
+docker compose -f docker-compose.test.yml down
 ```
 
-## CI jobs
+## GitHub Actions
 
 | Job | Проверки |
 |---|---|
-| `quality` | black, flake8, unit/API |
-| `integration` | clean migration, PostgreSQL/pgvector, NATS, integration/E2E |
-| `container` | Compose validation и Docker build |
+| `quality` | Black, Flake8, MyPy, unit/API |
+| `integration` | clean migration, PostgreSQL, NATS, integration/E2E, downgrade/upgrade |
+| `container` | Compose config, Docker build, non-root и smoke трёх ролей |
 
-## Что считается успешным
-
-- тест не отключён ради зелёного результата;
-- дефект сопровождается regression test;
-- unit tests не зависят от live network;
-- migration применяется на чистую БД;
-- E2E использует fixture и fake AI;
-- CI не выполняет model pull;
-- документация и code-map обновлены вместе с поведением.
-
-## Локальная верификация поставки
-
-Фактические результаты текущей поставки находятся в `docs/reports/`. Ограничения среды фиксируются явно: отсутствие Docker daemon или GitHub remote не подменяется бодрой выдумкой о зелёном облачном CI, как это иногда принято у менее стеснительных автоматов.
+Live TED/Contracts Finder и real Ollama намеренно не входят в обязательный CI.

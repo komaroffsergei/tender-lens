@@ -178,20 +178,35 @@ def test_search_contract_and_rate_headers():
     assert "raw_payload" not in body["items"][0]
     assert response.headers["X-RateLimit-Limit"] == "5"
     assert response.headers["X-RateLimit-Remaining"] == "4"
+    assert "Retry-After" not in response.headers
 
 
 def test_search_and_ask_share_counter_and_sixth_is_429():
     client, _, session = make_client(enabled_key(limit=5))
     headers = {"X-API-Key": "tl_test"}
     with client:
-        statuses = []
+        responses = []
         for index in range(6):
             endpoint = "/api/v1/search" if index % 2 == 0 else "/api/v1/ask"
-            statuses.append(
-                client.post(endpoint, headers=headers, json={"query": "server"}).status_code
-            )
-    assert statuses == [200, 200, 200, 200, 200, 429]
+            responses.append(client.post(endpoint, headers=headers, json={"query": "server"}))
+    assert [response.status_code for response in responses] == [200, 200, 200, 200, 200, 429]
+    assert "Retry-After" not in responses[4].headers
+    assert int(responses[5].headers["Retry-After"]) >= 1
     assert session.api_key.request_count == 5
+
+
+def test_ask_limit_is_at_most_five_while_search_accepts_ten():
+    client, _, _ = make_client(enabled_key(limit=10))
+    headers = {"X-API-Key": "tl_test"}
+    with client:
+        search_response = client.post(
+            "/api/v1/search", headers=headers, json={"query": "server", "limit": 10}
+        )
+        ask_response = client.post(
+            "/api/v1/ask", headers=headers, json={"query": "server", "limit": 6}
+        )
+    assert search_response.status_code == 200
+    assert ask_response.status_code == 422
 
 
 def test_validation_error_is_stable():
@@ -305,9 +320,7 @@ def test_unknown_tender_is_404():
     app.dependency_overrides[authenticate_api_key] = allow_auth
     app.dependency_overrides[get_session] = empty_session_override
     with client:
-        response = client.get(
-            f"/api/v1/tenders/{UUID(int=99)}", headers={"X-API-Key": "x"}
-        )
+        response = client.get(f"/api/v1/tenders/{UUID(int=99)}", headers={"X-API-Key": "x"})
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "not_found"
 

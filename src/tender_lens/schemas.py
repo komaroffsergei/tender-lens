@@ -131,6 +131,10 @@ class SearchRequest(BaseModel):
         return stripped
 
 
+class AskRequest(SearchRequest):
+    limit: int = Field(default=5, ge=1, le=5)
+
+
 class AttachmentBrief(BaseModel):
     id: UUID
     filename: str

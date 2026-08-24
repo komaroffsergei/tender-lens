@@ -23,17 +23,17 @@ class Settings(BaseSettings):
     app_env: Literal["local", "test", "production"] = "local"
     log_level: str = "INFO"
 
-    database_url: str = (
-        "postgresql+asyncpg://tender_lens:tender_lens@localhost:5432/tender_lens"
-    )
+    database_url: str = "postgresql+asyncpg://tender_lens:tender_lens@localhost:5432/tender_lens"
     nats_url: str = "nats://localhost:4222"
     ollama_url: str = "http://localhost:11434"
 
     ai_mode: Literal["live", "fake"] = "fake"
     embedding_model: str = "qwen3-embedding:0.6b"
-    # Размерность зафиксирована схемой PostgreSQL VECTOR(1024).
-    embedding_dimensions: Literal[1024] = 1024
+    # Размерность зафиксирована схемой PostgreSQL VECTOR(1024). Тип int нужен,
+    # чтобы pydantic-settings мог корректно разобрать строковое значение из .env.
+    embedding_dimensions: int = Field(default=1024)
     generation_model: str = "qwen3:1.7b"
+    min_relevance_score: float = Field(default=0.20, ge=-1.0, le=1.0)
 
     attachments_dir: Path = Path("./data/attachments")
     max_attachment_bytes: int = Field(default=20 * 1024 * 1024, ge=1024)
@@ -64,6 +64,8 @@ class Settings(BaseSettings):
     nats_stream_name: str = "TENDERS"
     nats_subject: str = "tender.changed.v1"
     nats_consumer_name: str = "INDEXER"
+    nats_ack_wait_seconds: float = Field(default=300.0, gt=0)
+    nats_max_deliver: int = Field(default=5, ge=1, le=100)
 
     @field_validator("ollama_url", "ted_base_url", "contracts_finder_base_url")
     @classmethod
@@ -74,6 +76,13 @@ class Settings(BaseSettings):
     @classmethod
     def normalize_log_level(cls, value: str) -> str:
         return value.upper()
+
+    @field_validator("embedding_dimensions")
+    @classmethod
+    def validate_embedding_dimensions(cls, value: int) -> int:
+        if value != 1024:
+            raise ValueError("embedding_dimensions должна быть равна 1024")
+        return value
 
 
 @lru_cache(maxsize=1)

@@ -139,6 +139,10 @@ LIMIT :limit
 5. модель должна отвечать только по контексту;
 6. API возвращает текст и ровно те sources, которые пришли из retrieval.
 
+Название и описание индексируются отдельными chunks, чтобы длинные метаданные не размывали их embeddings.
+Retrieval отбрасывает результаты ниже `MIN_RELEVANCE_SCORE` (по умолчанию `0.20`).
+Если после фильтра список пуст, generation provider не вызывается.
+
 ## 10. API-key и rate limit
 
 ### Аутентификация
@@ -160,3 +164,4 @@ X-API-Key → SHA-256 → lookup api_keys.key_hash → enabled check
 5. иначе увеличить count и commit.
 
 Row lock обеспечивает атомарность между конкурентными API-processes, работающими с одной БД.
+Успешный ответ содержит `X-RateLimit-*`; `Retry-After` добавляется только к HTTP 429.

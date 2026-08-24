@@ -9,6 +9,7 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
+from ipaddress import ip_address
 from typing import Any, Protocol
 from urllib.parse import urljoin, urlparse
 
@@ -83,7 +84,16 @@ class ResilientHttpClient:
         parsed = urlparse(url)
         if parsed.scheme not in {"http", "https"} or not parsed.hostname:
             raise SourceRequestError(f"Недопустимый URL: {url}")
-        if parsed.hostname.lower() not in self._allowed_hosts:
+        hostname = parsed.hostname.lower()
+        if hostname == "localhost" or hostname.endswith((".localhost", ".local")):
+            raise SourceRequestError(f"Локальный host запрещён политикой crawler: {hostname}")
+        try:
+            address = ip_address(hostname)
+        except ValueError:
+            address = None
+        if address is not None and not address.is_global:
+            raise SourceRequestError(f"Локальный IP запрещён политикой crawler: {hostname}")
+        if hostname not in self._allowed_hosts:
             raise SourceRequestError(f"Host не разрешён политикой crawler: {parsed.hostname}")
 
     def _is_retryable_status(self, status_code: int) -> bool:
@@ -112,9 +122,9 @@ class ResilientHttpClient:
                     if retry_at is not None:
                         if retry_at.tzinfo is None:
                             retry_at = retry_at.replace(tzinfo=UTC)
-                        return max(0.0, (retry_at - datetime.now(UTC)).total_seconds())
+                        return float(max(0.0, (retry_at - datetime.now(UTC)).total_seconds()))
         exponential = self._base_delay * (2 ** max(0, attempt - 1))
-        return exponential + self._jitter * self._random()
+        return float(exponential + self._jitter * self._random())
 
     async def _polite_delay(self) -> None:
         delay = self._base_delay + self._jitter * self._random()
@@ -126,8 +136,9 @@ class ResilientHttpClient:
         current_url = url
         redirects = 0
         last_error: Exception | None = None
+        attempt = 1
 
-        for attempt in range(1, self._max_attempts + 1):
+        while attempt <= self._max_attempts:
             await self._polite_delay()
             try:
                 async with self._semaphore:
@@ -143,6 +154,7 @@ class ResilientHttpClient:
                 if attempt == self._max_attempts:
                     break
                 await self._sleep(self._retry_delay(None, attempt))
+                attempt += 1
                 continue
 
             if response.is_redirect:
@@ -154,6 +166,7 @@ class ResilientHttpClient:
                     raise SourceRequestError("Превышено число redirect")
                 current_url = urljoin(str(response.url), location)
                 self._validate_host(current_url)
+                # Redirect не является повторной попыткой после сбоя.
                 continue
 
             if self._is_retryable_status(response.status_code):
@@ -162,6 +175,7 @@ class ResilientHttpClient:
                         f"Источник ответил HTTP {response.status_code} после {attempt} попыток"
                     )
                 await self._sleep(self._retry_delay(response, attempt))
+                attempt += 1
                 continue
 
             try:
@@ -202,13 +216,13 @@ class ResilientHttpClient:
         last_error: Exception | None = None
         current_url = url
         redirects = 0
+        attempt = 1
 
-        for attempt in range(1, self._max_attempts + 1):
+        while attempt <= self._max_attempts:
             await self._polite_delay()
             await self._semaphore.acquire()
             response: httpx.Response | None = None
-            action = "failed"
-            delay = 0.0
+            retry_delay: float | None = None
             try:
                 request = self._client.build_request("GET", current_url)
                 response = await self._client.send(
@@ -226,14 +240,16 @@ class ResilientHttpClient:
                         raise SourceRequestError("Превышено число redirect")
                     current_url = urljoin(str(response.url), location)
                     self._validate_host(current_url)
-                    action = "redirect"
+                    # Redirect не расходует лимит retry; следующий URL всё равно
+                    # проходит полную проверку схемы и host.
+                    continue
                 elif self._is_retryable_status(response.status_code):
                     if attempt == self._max_attempts:
                         raise SourceRequestError(
                             f"Загрузка файла завершилась HTTP {response.status_code}"
                         )
-                    delay = self._retry_delay(response, attempt)
-                    action = "retry"
+                    retry_delay = self._retry_delay(response, attempt)
+                    attempt += 1
                 else:
                     try:
                         response.raise_for_status()
@@ -250,17 +266,15 @@ class ResilientHttpClient:
             except (httpx.TimeoutException, httpx.NetworkError) as exc:
                 last_error = exc
                 if attempt < self._max_attempts:
-                    delay = self._retry_delay(None, attempt)
-                    action = "retry"
+                    retry_delay = self._retry_delay(None, attempt)
+                    attempt += 1
             finally:
                 if response is not None:
                     await response.aclose()
                 self._semaphore.release()
 
-            if action == "redirect":
-                continue
-            if action == "retry":
-                await self._sleep(delay)
+            if retry_delay is not None:
+                await self._sleep(retry_delay)
                 continue
             break
 

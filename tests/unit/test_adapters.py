@@ -6,6 +6,7 @@ import httpx
 import pytest
 
 from tender_lens.crawler.base import ResilientHttpClient
+from tender_lens.crawler.__main__ import _source_hosts
 from tender_lens.crawler.contracts_finder import ContractsFinderAdapter
 from tender_lens.crawler.ted import TedAdapter
 
@@ -13,6 +14,7 @@ from tender_lens.crawler.ted import TedAdapter
 def no_sleep(_: float):
     async def done():
         return None
+
     return done()
 
 
@@ -41,10 +43,22 @@ def test_contracts_finder_fixture_mapping(fixture_dir):
     assert record.attachments[0].filename == "specification.pdf"
 
 
-@pytest.mark.parametrize("mapper,fixture_name,collection", [
-    (TedAdapter.map_notice, "ted_search_response.json", "notices"),
-    (ContractsFinderAdapter.map_release, "contracts_finder_ocds.json", "releases"),
-])
+def test_contracts_finder_allows_known_official_attachment_hosts():
+    assert {
+        "www.contractsfinder.service.gov.uk",
+        "supplierregistration.cabinetoffice.gov.uk",
+        "ted.europa.eu",
+        "www.find-tender.service.gov.uk",
+    } <= _source_hosts("contracts_finder")
+
+
+@pytest.mark.parametrize(
+    "mapper,fixture_name,collection",
+    [
+        (TedAdapter.map_notice, "ted_search_response.json", "notices"),
+        (ContractsFinderAdapter.map_release, "contracts_finder_ocds.json", "releases"),
+    ],
+)
 def test_common_adapter_contract(mapper, fixture_name, collection, fixture_dir):
     record = mapper(load(fixture_dir / fixture_name)[collection][0])
     assert record.external_id

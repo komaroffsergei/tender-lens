@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.0
+
+- исправлен запуск из `.env.example` и включён MyPy в CI;
+- исправлена изоляция event loop интеграционных тестов;
+- усилена redirect/SSRF-политика и allowlist вложений Contracts Finder;
+- добавлены cursor, pending republish и real JetStream E2E проверки;
+- добавлены отдельные title/description chunks, relevance threshold и short circuit RAG без вызова LLM;
+- `Retry-After` ограничен ответами 429, `/ask` — пятью источниками;
+- индексатор защищён от stale failure и получил bounded durable delivery;
+- добавлены Docker role smoke и reversible migration check;
+- публичная документация сфокусирована на тестовом задании №7.
+
 ## 0.1.0
 
 - async TED and Contracts Finder adapters;

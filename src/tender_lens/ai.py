@@ -16,14 +16,11 @@ _TOKEN_RE = re.compile(r"[\w-]+", re.UNICODE)
 
 
 class AIProvider(Protocol):
-    async def embed(self, texts: list[str]) -> list[list[float]]:
-        ...
+    async def embed(self, texts: list[str]) -> list[list[float]]: ...
 
-    async def generate(self, *, system: str, prompt: str) -> str:
-        ...
+    async def generate(self, *, system: str, prompt: str) -> str: ...
 
-    async def health(self) -> bool:
-        ...
+    async def health(self) -> bool: ...
 
 
 class FakeAIProvider:
@@ -52,9 +49,7 @@ class FakeAIProvider:
         del system
         self.generate_calls += 1
         context_lines = [
-            line[9:].strip()
-            for line in prompt.splitlines()
-            if line.startswith("ФРАГМЕНТ:")
+            line[9:].strip() for line in prompt.splitlines() if line.startswith("ФРАГМЕНТ:")
         ]
         if not context_lines:
             return "Данных недостаточно для ответа по загруженной базе закупок."

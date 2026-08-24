@@ -14,6 +14,7 @@ from tender_lens.api.rate_limit import rate_limited_key
 from tender_lens.errors import AppError
 from tender_lens.models import Tender
 from tender_lens.schemas import (
+    AskRequest,
     AskResponse,
     AttachmentDetails,
     SearchRequest,
@@ -98,9 +99,7 @@ async def tender_details(tender_id: UUID, session=Depends(get_session)) -> Tende
     tags=["search"],
 )
 async def search(request: Request, payload: SearchRequest, session=Depends(get_session)):
-    response = await request.app.state.search_service.search(
-        session, payload.query, payload.limit
-    )
+    response = await request.app.state.search_service.search(session, payload.query, payload.limit)
     headers = request.state.rate_limit.headers
     return JSONResponse(content=response.model_dump(mode="json"), headers=headers)
 
@@ -111,7 +110,7 @@ async def search(request: Request, payload: SearchRequest, session=Depends(get_s
     dependencies=[Depends(rate_limited_key)],
     tags=["search"],
 )
-async def ask(request: Request, payload: SearchRequest, session=Depends(get_session)):
+async def ask(request: Request, payload: AskRequest, session=Depends(get_session)):
     response = await request.app.state.search_service.ask(session, payload.query, payload.limit)
     headers = request.state.rate_limit.headers
     return JSONResponse(content=response.model_dump(mode="json"), headers=headers)

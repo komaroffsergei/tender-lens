@@ -58,9 +58,7 @@ def metadata_text(tender: Tender) -> TextUnit:
         ("Заказчик", tender.buyer_name),
         (
             "Сумма",
-            f"{tender.amount} {tender.currency or ''}"
-            if tender.amount is not None
-            else None,
+            f"{tender.amount} {tender.currency or ''}" if tender.amount is not None else None,
         ),
         ("Опубликовано", tender.published_at.isoformat() if tender.published_at else None),
         ("Срок подачи", tender.deadline.isoformat() if tender.deadline else None),
@@ -68,6 +66,20 @@ def metadata_text(tender: Tender) -> TextUnit:
     ]
     text = "\n\n".join(f"{label}: {value}" for label, value in fields if value)
     return TextUnit(attachment_id=None, section="Метаданные закупки", text=text)
+
+
+def title_text(tender: Tender) -> TextUnit:
+    """Выделяет название отдельно, чтобы длинное описание не размывало его embedding."""
+
+    return TextUnit(attachment_id=None, section="Название закупки", text=tender.title)
+
+
+def description_text(tender: Tender) -> TextUnit | None:
+    """Сохраняет описание отдельным retrieval unit, если источник его предоставил."""
+
+    if not tender.description:
+        return None
+    return TextUnit(attachment_id=None, section="Описание закупки", text=tender.description)
 
 
 def _read_bytes(path: Path, max_bytes: int) -> bytes:

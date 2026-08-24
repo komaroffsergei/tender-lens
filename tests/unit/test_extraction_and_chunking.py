@@ -10,6 +10,7 @@ from tender_lens.errors import ExtractionError
 from tender_lens.indexer.chunk import chunk_units
 from tender_lens.indexer.extract import (
     TextUnit,
+    description_text,
     extract_attachment,
     extract_html,
     extract_json,
@@ -17,6 +18,7 @@ from tender_lens.indexer.extract import (
     extract_txt,
     extract_xml,
     metadata_text,
+    title_text,
 )
 from tender_lens.models import Attachment, Tender
 
@@ -45,8 +47,16 @@ def test_metadata_has_labels():
         raw_payload={},
     )
     text = metadata_text(tender).text
+    title = title_text(tender)
     assert "Название: Поставка серверов" in text
     assert "Заказчик: Администрация" in text
+    assert title.section == "Название закупки"
+    assert title.text == "Поставка серверов"
+    assert description_text(tender) is None
+    tender.description = "Серверы с гарантией"
+    description = description_text(tender)
+    assert description is not None
+    assert description.text == "Серверы с гарантией"
 
 
 def test_text_pdf_is_extracted(fixture_dir):
@@ -107,8 +117,7 @@ def test_long_text_respects_limit_and_overlap():
     assert len(chunks) > 2
     assert all(len(item.content) <= 300 for item in chunks)
     assert any(
-        chunks[index].content[-20:] in chunks[index + 1].content
-        for index in range(len(chunks) - 1)
+        chunks[index].content[-20:] in chunks[index + 1].content for index in range(len(chunks) - 1)
     )
 
 

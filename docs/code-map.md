@@ -1,75 +1,44 @@
-# Code map
+# Карта кода
 
-## Корень
-
-| Путь | Назначение |
-|---|---|
-| `pyproject.toml` | package metadata, зависимости, black/pytest/mypy config |
-| `requirements*.lock` | фиксированные runtime/dev зависимости |
-| `Dockerfile` | единый non-root application image |
-| `docker-compose.yml` | runtime stack |
-| `docker-compose.test.yml` | локальная PostgreSQL/NATS test infra |
-| `alembic.ini`, `migrations/` | схема PostgreSQL/pgvector |
-| `.github/workflows/ci.yml` | quality, integration и container jobs |
-| `scripts/` | fixture demo, live smoke, JSON Schema export и release packager |
-| `schemas/` | проверяемые wire contracts |
-| `examples/fixtures/` | детерминированные TED/CF/PDF/XML/HTML/TXT fixtures |
-| `docs/reports/` | фактическая локальная верификация и ограничения среды |
-
-## Python package
+## Общие модули
 
 | Путь | Ответственность |
 |---|---|
-| `config.py` | Pydantic Settings |
-| `errors.py` | typed errors |
-| `logging.py` | JSON logs и masking |
-| `schemas.py` | Pydantic source/NATS/API contracts |
-| `hashing.py` | deterministic tender/chunk hashes |
-| `models.py` | ровно пять SQLAlchemy models |
-| `db.py` | async engine/session factory |
-| `storage.py` | safe streaming attachments |
-| `nats.py` | JetStream broker и in-memory test broker |
-| `ai.py` | fake/live embeddings и generation |
-| `search.py` | exact pgvector retrieval и RAG orchestration |
-| `cli.py` | API keys и demo seed |
+| `config.py` | типизированные env-настройки |
+| `schemas.py` | контракты источников, событий и API |
+| `models.py`, `db.py` | SQLAlchemy и async session |
+| `storage.py` | безопасная потоковая запись вложений |
+| `nats.py` | stream, publish и durable consumer |
+| `ai.py`, `search.py` | fake/Ollama, pgvector retrieval и RAG |
 
 ## Crawler
 
 | Путь | Ответственность |
 |---|---|
-| `crawler/base.py` | SourceAdapter, SourcePage, resilient HTTP policy |
-| `crawler/ted.py` | TED Search API normalization |
-| `crawler/contracts_finder.py` | OCDS normalization |
-| `crawler/fixture.py` | offline E2E adapter |
-| `crawler/service.py` | cursor, upsert, downloads, publish/republish |
-| `crawler/__main__.py` | process loop и source isolation |
+| `crawler/base.py` | SourceAdapter и безопасная HTTP-политика |
+| `crawler/ted.py` | нормализация TED Search API |
+| `crawler/contracts_finder.py` | нормализация Contracts Finder OCDS |
+| `crawler/fixture.py` | offline adapter для тестов |
+| `crawler/service.py` | cursor, UPSERT, вложения и publish/republish |
+| `crawler/__main__.py` | CLI, source isolation и периодический цикл |
 
-## Indexer
-
-| Путь | Ответственность |
-|---|---|
-| `indexer/extract.py` | metadata/PDF/XML/HTML/JSON/TXT extraction |
-| `indexer/chunk.py` | deterministic paragraph chunking |
-| `indexer/service.py` | idempotent atomic index replacement |
-| `indexer/__main__.py` | durable consumer/ACK/NAK loop |
-
-## API/UI
+## Indexer и API
 
 | Путь | Ответственность |
 |---|---|
-| `api/auth.py` | API-key generation/hash/auth |
-| `api/rate_limit.py` | atomic fixed-window limiter |
-| `api/routes.py` | health, tender, search, ask |
-| `api/main.py` | lifespan, errors, middleware, static mount |
-| `web/index.html` | semantic form/result structure |
-| `web/styles.css` | desktop/mobile adaptive presentation |
-| `web/app.js` | sessionStorage, fetch, safe DOM rendering |
+| `indexer/extract.py` | PDF/XML/HTML/JSON/TXT extraction |
+| `indexer/chunk.py` | детерминированный chunking |
+| `indexer/service.py` | атомарная и stale-safe индексация |
+| `api/auth.py` | hash-only API-key authentication |
+| `api/rate_limit.py` | PostgreSQL fixed-window limiter |
+| `api/routes.py`, `api/main.py` | HTTP-контракты, lifecycle и ошибки |
+| `web/` | статический адаптивный UI |
 
-## Тесты
+## Проверки
 
 | Путь | Уровень |
 |---|---|
-| `tests/unit/` | pure logic, HTTP mocks, static contracts |
+| `tests/unit/` | pure logic и HTTP mocks |
 | `tests/api/` | FastAPI in-process |
 | `tests/integration/` | PostgreSQL/pgvector и NATS |
-| `tests/e2e/` | fixture ingestion → index → search/ask |
+| `tests/e2e/` | полный fixture pipeline |

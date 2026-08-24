@@ -83,7 +83,9 @@ def create_app(
         application.state.settings = settings
         application.state.session_factory = actual_sessions
         application.state.ai = actual_ai
-        application.state.search_service = search_service or SearchService(actual_ai)
+        application.state.search_service = search_service or SearchService(
+            actual_ai, settings.min_relevance_score
+        )
         yield
         if owns_ai and isinstance(actual_ai, OllamaAIProvider):
             await actual_ai.aclose()
@@ -92,7 +94,7 @@ def create_app(
 
     application = FastAPI(
         title="TenderLens API",
-        version="0.1.0",
+        version="0.2.0",
         description="Поиск и grounded RAG по открытым закупкам.",
         lifespan=lifespan,
     )
@@ -110,9 +112,7 @@ def create_app(
         return _error_response(request, error)
 
     @application.exception_handler(RequestValidationError)
-    async def validation_handler(
-        request: Request, error: RequestValidationError
-    ) -> JSONResponse:
+    async def validation_handler(request: Request, error: RequestValidationError) -> JSONResponse:
         app_error = AppError(
             "validation_error",
             "Запрос не прошёл валидацию.",

@@ -1,119 +1,71 @@
-# Эксплуатация TenderLens
+# Эксплуатация
 
 ## Конфигурация
 
-Все поддержанные переменные перечислены в `.env.example` и типизированы в `src/tender_lens/config.py`.
+Все переменные перечислены в `.env.example` и валидируются в `Settings`.
 
-Критические:
+Ключевые настройки:
 
 ```dotenv
-DATABASE_URL=postgresql+asyncpg://...
+DATABASE_URL=postgresql+asyncpg://tender_lens:tender_lens@postgres:5432/tender_lens
 NATS_URL=nats://nats:4222
-AI_MODE=fake|live
-OLLAMA_URL=http://ollama:11434
-EMBEDDING_MODEL=qwen3-embedding:0.6b
+AI_MODE=fake
 EMBEDDING_DIMENSIONS=1024
-GENERATION_MODEL=qwen3:1.7b
+MIN_RELEVANCE_SCORE=0.20
 ATTACHMENTS_DIR=/data/attachments
 MAX_ATTACHMENT_BYTES=20971520
+CRAWL_MAX_CONCURRENCY=3
+ATTACHMENT_MAX_CONCURRENCY=2
+NATS_ACK_WAIT_SECONDS=300
+NATS_MAX_DELIVER=5
 ```
 
-`EMBEDDING_DIMENSIONS` не является произвольной runtime-настройкой: миграция хранит `VECTOR(1024)`, поэтому Pydantic принимает только `1024`.
+`EMBEDDING_DIMENSIONS` читается из строкового env, но допускает только 1024, потому что migration создаёт `VECTOR(1024)`.
 
 ## Первый запуск
 
 ```bash
 cp .env.example .env
 docker compose up --build -d
+docker compose ps
 ```
 
-`migrate` завершается до запуска прикладных ролей.
+`migrate` должен завершиться с кодом 0, а `api` — перейти в healthy.
 
-Проверка:
+## API-ключ
 
 ```bash
-curl -fsS http://localhost:8000/health/live
-curl -fsS http://localhost:8000/health/ready
+docker compose run --rm api \
+  python -m tender_lens.cli create-api-key --name demo --limit 5
 ```
 
-## Управление ключами
+Открытый ключ выводится один раз. В PostgreSQL хранится только SHA-256.
+
+## Диагностика
 
 ```bash
-docker compose run --rm api python -m tender_lens.cli create-api-key --name demo --limit 5
-docker compose run --rm api python -m tender_lens.cli list-api-keys
-docker compose run --rm api python -m tender_lens.cli disable-api-key demo
+curl http://localhost:8000/health/live
+curl http://localhost:8000/health/ready
+docker compose logs --tail=200 crawler indexer api
 ```
 
-Открытый ключ нельзя восстановить из БД. При утрате создаётся новый.
+Readiness проверяет PostgreSQL и выбранный AI provider. NATS доступен через monitoring endpoint на порту 8222.
 
-## Диагностика ingestion
+## Live crawl
 
 ```bash
-docker compose logs -f crawler
-docker compose logs -f indexer
-docker compose logs -f nats
+docker compose run --rm crawler \
+  python -m tender_lens.crawler --once --source all --max-items 5
 ```
 
-Pending:
+Live-smoke не является частью CI. При изменении внешнего API сначала обновляются сохранённые fixtures и contract tests.
 
-```sql
-SELECT id, title, content_hash, indexed_hash, index_status, last_error
-FROM tenders
-WHERE index_status IN ('pending', 'failed')
-ORDER BY updated_at;
-```
+## Резервное копирование
 
-`pending` будет переопубликован следующим crawler cycle. `failed` означает, что индексатор записал typed error; JetStream message остаётся без ACK и повторяется.
+Минимально необходимо сохранять:
 
-## Проверка NATS
+- PostgreSQL;
+- volume `attachments_data`;
+- `.env` без публикации в Git.
 
-Monitoring endpoint:
-
-```text
-http://localhost:8222
-```
-
-Ожидаются stream `TENDERS`, subject `tender.changed.v1`, durable consumer `INDEXER`.
-
-## Смена embedding model
-
-Нельзя смешивать в одной колонке векторы разных пространств. При смене модели:
-
-1. сохранить backup;
-2. убедиться, что новая модель отдаёт 1024 dimensions;
-3. изменить `EMBEDDING_MODEL`;
-4. поставить существующие tenders в `pending`, обнулить `indexed_hash`;
-5. позволить crawler переопубликовать события;
-6. проверить Search benchmark.
-
-## Backup
-
-Для демонстрационной среды:
-
-```bash
-docker compose exec -T postgres \
-  pg_dump -U tender_lens -d tender_lens -Fc > tender-lens.dump
-```
-
-Вложения находятся в volume `attachments_data`, NATS state в `nats_data`.
-
-## Остановка
-
-```bash
-docker compose down
-```
-
-Удаление всех данных выполняется только намеренно:
-
-```bash
-docker compose down -v
-```
-
-## Live source policy
-
-- максимум 5 записей в smoke-run;
-- не запускать live источники в CI;
-- соблюдать delay и concurrency limits;
-- не обходить CAPTCHA/authorization;
-- не коммитить скачанные файлы;
-- при изменении внешнего contract сначала обновить fixture и adapter tests.
+JetStream хранит события для восстановления фоновой обработки, но не заменяет резервную копию PostgreSQL.

@@ -1,34 +1,29 @@
-# Progress и история поставки
+# Состояние проекта
 
-## Реализованные этапы
+## Готовность
 
-| Этап | Состояние | Результат |
-|---:|---|---|
-| 00 | DONE | SDD pack, спецификации, схемы и reference assets |
-| 01–03 | DONE | package/tooling, Compose, Alembic, pgvector schema |
-| 04–06 | DONE | contracts, hashing, TED/CF adapters, crawler, attachments |
-| 07–09 | DONE | JetStream, extraction, chunking, embeddings, exact search |
-| 10–14 | DONE | second source, FastAPI, auth, limiter, RAG, static UI |
-| 15 | DONE WITH ENV LIMITATIONS | tests/docs/archive/git bundle; cloud CI requires repository remote |
+TenderLens доведён до публикуемого решения задания №7.
 
-## Содержательные commits feature branch
+- стандартный запуск из `.env.example` проверен;
+- TED и Contracts Finder работают через единый async-контракт;
+- официальные host вложений разрешены точечно;
+- PostgreSQL/pgvector и NATS проверяются в GitHub Actions;
+- низкорелевантный RAG-контекст отфильтровывается;
+- `Retry-After` возвращается только на 429;
+- Black, Flake8 и MyPy являются блокирующими CI-проверками;
+- migration проверяется в направлениях upgrade и downgrade;
+- Docker image запускается от пользователя `app`;
+- fixture E2E проходит через реальный JetStream и защищённый API.
 
-```text
-4876919 feat(stage-01-03): add runtime tooling, compose stack and PostgreSQL schema
-85d113b feat(stage-05-06): implement asynchronous source adapters and attachment ingestion
-bb5e927 feat(stage-07-09): add JetStream indexing, embeddings and exact vector search
-ec8d5cb feat(stage-11-14): expose protected API, rate limiter, demo CLI and static UI
-24c0cf9 test(stage-15): complete regression suite, CI and delivery documentation
-```
+## Проверенная поставка
 
-Финальные regression tests и документация зафиксированы в feature branch; merge commit и tag создаются перед упаковкой.
+| Область | Результат |
+|---|---|
+| Unit/API | 114 passed |
+| PostgreSQL/NATS integration | 13 passed |
+| Полный fixture E2E | 4 passed |
+| Полный локальный прогон | 131 passed |
+| GitHub Actions | quality, integration и container jobs |
+| Публичный репозиторий | `komaroffsergei/tender-lens` |
 
-## Проверяемые ограничения среды сборки архива
-
-- локальный Docker daemon отсутствовал, поэтому container/integration stack не запускался здесь;
-- PostgreSQL/NATS binaries также отсутствовали;
-- GitHub remote пользователя не был указан, поэтому push/PR/cloud Actions нельзя честно выполнить;
-- unit/API/static проверки выполнены локально;
-- integration/container jobs полностью описаны в `.github/workflows/ci.yml` и запускаются после push в любой GitHub repository.
-
-Это не функциональное ограничение проекта, а ограничение среды подготовки архива. `docs/reports/` содержит фактические команды и результаты без дорисованных зелёных галочек.
+Live-smoke внешних источников не запускается в CI. Он предназначен только для ручной проверки актуальности внешних контрактов.

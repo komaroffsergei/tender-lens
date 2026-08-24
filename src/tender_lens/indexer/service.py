@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from typing import cast
 from uuid import UUID
 
 from sqlalchemy import delete, select
@@ -15,7 +16,12 @@ from tender_lens.db import SessionFactory
 from tender_lens.errors import ExtractionError
 from tender_lens.hashing import build_chunk_key, chunk_content_hash
 from tender_lens.indexer.chunk import chunk_units
-from tender_lens.indexer.extract import extract_attachment, metadata_text
+from tender_lens.indexer.extract import (
+    description_text,
+    extract_attachment,
+    metadata_text,
+    title_text,
+)
 from tender_lens.models import Chunk, Tender
 from tender_lens.schemas import TenderChangedV1
 
@@ -44,16 +50,19 @@ class IndexerService:
 
     async def _load_tender(self, tender_id: UUID) -> Tender | None:
         async with self._session_factory() as session:
-            return await session.scalar(
-                select(Tender)
-                .where(Tender.id == tender_id)
-                .options(selectinload(Tender.attachments))
+            return cast(
+                Tender | None,
+                await session.scalar(
+                    select(Tender)
+                    .where(Tender.id == tender_id)
+                    .options(selectinload(Tender.attachments))
+                ),
             )
 
-    async def _mark_failed(self, tender_id: UUID, message: str) -> None:
+    async def _mark_failed(self, tender_id: UUID, content_hash: str, message: str) -> None:
         async with self._session_factory() as session:
             tender = await session.get(Tender, tender_id, with_for_update=True)
-            if tender is not None:
+            if tender is not None and tender.content_hash == content_hash:
                 tender.index_status = "failed"
                 tender.last_error = message[:4000]
                 await session.commit()
@@ -78,7 +87,11 @@ class IndexerService:
 
         warnings: list[str] = []
         try:
-            units = [metadata_text(tender)]
+            units = [title_text(tender)]
+            description = description_text(tender)
+            if description is not None:
+                units.append(description)
+            units.append(metadata_text(tender))
             for attachment in tender.attachments:
                 try:
                     units.extend(
@@ -138,5 +151,5 @@ class IndexerService:
                 await session.commit()
             return IndexResult(tender.id, "ready", len(new_chunks), warnings)
         except Exception as exc:
-            await self._mark_failed(tender.id, str(exc))
+            await self._mark_failed(tender.id, event.content_hash, str(exc))
             raise
