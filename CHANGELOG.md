@@ -6,7 +6,7 @@
 - исправлена изоляция event loop интеграционных тестов;
 - усилена redirect/SSRF-политика и allowlist вложений Contracts Finder;
 - добавлены cursor, pending republish и real JetStream E2E проверки;
-- добавлен relevance threshold и short circuit RAG без вызова LLM;
+- добавлены отдельные title/description chunks, relevance threshold и short circuit RAG без вызова LLM;
 - `Retry-After` ограничен ответами 429, `/ask` — пятью источниками;
 - индексатор защищён от stale failure и получил bounded durable delivery;
 - добавлены Docker role smoke и reversible migration check;

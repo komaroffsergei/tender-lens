@@ -68,6 +68,20 @@ def metadata_text(tender: Tender) -> TextUnit:
     return TextUnit(attachment_id=None, section="Метаданные закупки", text=text)
 
 
+def title_text(tender: Tender) -> TextUnit:
+    """Выделяет название отдельно, чтобы длинное описание не размывало его embedding."""
+
+    return TextUnit(attachment_id=None, section="Название закупки", text=tender.title)
+
+
+def description_text(tender: Tender) -> TextUnit | None:
+    """Сохраняет описание отдельным retrieval unit, если источник его предоставил."""
+
+    if not tender.description:
+        return None
+    return TextUnit(attachment_id=None, section="Описание закупки", text=tender.description)
+
+
 def _read_bytes(path: Path, max_bytes: int) -> bytes:
     size = path.stat().st_size
     if size > max_bytes:

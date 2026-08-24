@@ -311,14 +311,38 @@ async def test_old_failed_event_does_not_mark_new_version_failed(
 
 @pytest.mark.asyncio
 async def test_irrelevant_question_skips_generation(session_factory, integration_settings):
+    query = "xylophone nebula pineapple archaeology"
+    ai = FakeAIProvider(1024)
+    query_vector = (await ai.embed([query]))[0]
+    title_tokens: list[str] = []
+    observed_score = 0.0
+    for index in range(10_000):
+        token = f"unrelated{index}"
+        token_vector = (await ai.embed([token]))[0]
+        token_score = sum(
+            left * right for left, right in zip(query_vector, token_vector, strict=True)
+        )
+        if not title_tokens:
+            if token_score <= 0:
+                continue
+        elif token_score != 0:
+            continue
+        title_tokens.append(token)
+        title_vector = (await ai.embed([" ".join(title_tokens)]))[0]
+        observed_score = sum(
+            left * right for left, right in zip(query_vector, title_vector, strict=True)
+        )
+        if 0.15 < observed_score < 0.20:
+            break
+
+    assert 0.15 < observed_score < 0.20
     crawler = CrawlerService(
         settings=integration_settings,
         session_factory=session_factory,
         attachment_client=UnusedAttachmentClient(),  # type: ignore[arg-type]
         publisher=InMemoryBroker(),
     )
-    persisted = await crawler.persist_record(record())
-    ai = FakeAIProvider(1024)
+    persisted = await crawler.persist_record(record(" ".join(title_tokens)))
     await IndexerService(
         settings=integration_settings,
         session_factory=session_factory,
@@ -331,9 +355,9 @@ async def test_irrelevant_question_skips_generation(session_factory, integration
     )
 
     async with session_factory() as session:
-        response = await SearchService(ai, min_relevance_score=0.15).ask(
+        response = await SearchService(ai, min_relevance_score=0.20).ask(
             session,
-            "xylophone nebula pineapple archaeology",
+            query,
             5,
         )
 

@@ -29,7 +29,7 @@ def test_entrypoints_import_without_external_connections(module):
 def test_default_settings_are_valid(tmp_path):
     settings = Settings(_env_file=None, attachments_dir=tmp_path)
     assert settings.embedding_dimensions == 1024
-    assert settings.min_relevance_score == 0.15
+    assert settings.min_relevance_score == 0.20
     assert settings.nats_max_deliver == 5
     assert settings.crawl_max_concurrency >= 1
     assert settings.default_rate_limit_per_minute == 5

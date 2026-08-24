@@ -16,7 +16,12 @@ from tender_lens.db import SessionFactory
 from tender_lens.errors import ExtractionError
 from tender_lens.hashing import build_chunk_key, chunk_content_hash
 from tender_lens.indexer.chunk import chunk_units
-from tender_lens.indexer.extract import extract_attachment, metadata_text
+from tender_lens.indexer.extract import (
+    description_text,
+    extract_attachment,
+    metadata_text,
+    title_text,
+)
 from tender_lens.models import Chunk, Tender
 from tender_lens.schemas import TenderChangedV1
 
@@ -82,7 +87,11 @@ class IndexerService:
 
         warnings: list[str] = []
         try:
-            units = [metadata_text(tender)]
+            units = [title_text(tender)]
+            description = description_text(tender)
+            if description is not None:
+                units.append(description)
+            units.append(metadata_text(tender))
             for attachment in tender.attachments:
                 try:
                     units.extend(

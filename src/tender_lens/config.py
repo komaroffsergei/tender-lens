@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     # чтобы pydantic-settings мог корректно разобрать строковое значение из .env.
     embedding_dimensions: int = Field(default=1024)
     generation_model: str = "qwen3:1.7b"
-    min_relevance_score: float = Field(default=0.15, ge=-1.0, le=1.0)
+    min_relevance_score: float = Field(default=0.20, ge=-1.0, le=1.0)
 
     attachments_dir: Path = Path("./data/attachments")
     max_attachment_bytes: int = Field(default=20 * 1024 * 1024, ge=1024)

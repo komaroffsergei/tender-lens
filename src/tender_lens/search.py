@@ -16,7 +16,7 @@ def vector_literal(vector: list[float]) -> str:
 
 
 class SearchService:
-    def __init__(self, ai: AIProvider, min_relevance_score: float = 0.15) -> None:
+    def __init__(self, ai: AIProvider, min_relevance_score: float = 0.20) -> None:
         self._ai = ai
         self._min_relevance_score = min_relevance_score
 
