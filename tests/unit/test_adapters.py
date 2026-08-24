@@ -6,6 +6,7 @@ import httpx
 import pytest
 
 from tender_lens.crawler.base import ResilientHttpClient
+from tender_lens.crawler.__main__ import _source_hosts
 from tender_lens.crawler.contracts_finder import ContractsFinderAdapter
 from tender_lens.crawler.ted import TedAdapter
 
@@ -40,6 +41,15 @@ def test_contracts_finder_fixture_mapping(fixture_dir):
     assert record.external_id == "CF-EXAMPLE-001"
     assert record.buyer_name == "Example Borough Council"
     assert record.attachments[0].filename == "specification.pdf"
+
+
+def test_contracts_finder_allows_known_official_attachment_hosts():
+    assert {
+        "www.contractsfinder.service.gov.uk",
+        "supplierregistration.cabinetoffice.gov.uk",
+        "ted.europa.eu",
+        "www.find-tender.service.gov.uk",
+    } <= _source_hosts("contracts_finder")
 
 
 @pytest.mark.parametrize(

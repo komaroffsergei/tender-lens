@@ -46,6 +46,9 @@ def _source_hosts(source: str) -> set[str]:
         "www.contractsfinder.service.gov.uk",
         "contractsfinder.service.gov.uk",
         "assets.publishing.service.gov.uk",
+        "supplierregistration.cabinetoffice.gov.uk",
+        "ted.europa.eu",
+        "www.find-tender.service.gov.uk",
     }
 
 
