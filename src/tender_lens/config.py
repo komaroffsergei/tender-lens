@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     # чтобы pydantic-settings мог корректно разобрать строковое значение из .env.
     embedding_dimensions: int = Field(default=1024)
     generation_model: str = "qwen3:1.7b"
+    min_relevance_score: float = Field(default=0.15, ge=-1.0, le=1.0)
 
     attachments_dir: Path = Path("./data/attachments")
     max_attachment_bytes: int = Field(default=20 * 1024 * 1024, ge=1024)
@@ -63,6 +64,8 @@ class Settings(BaseSettings):
     nats_stream_name: str = "TENDERS"
     nats_subject: str = "tender.changed.v1"
     nats_consumer_name: str = "INDEXER"
+    nats_ack_wait_seconds: float = Field(default=300.0, gt=0)
+    nats_max_deliver: int = Field(default=5, ge=1, le=100)
 
     @field_validator("ollama_url", "ted_base_url", "contracts_finder_base_url")
     @classmethod

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import asyncio
 
 import httpx
 import pytest
@@ -8,13 +9,17 @@ import pytest_asyncio
 from sqlalchemy import text
 
 from tender_lens.ai import FakeAIProvider
+from tender_lens.api.auth import hash_api_key
+from tender_lens.api.main import create_app
 from tender_lens.config import Settings
 from tender_lens.crawler.base import ResilientHttpClient
 from tender_lens.crawler.fixture import FixtureAdapter
 from tender_lens.crawler.service import CrawlerService
 from tender_lens.db import create_engine, create_session_factory
 from tender_lens.indexer.service import IndexerService
-from tender_lens.nats import InMemoryBroker
+from tender_lens.models import ApiKey
+from tender_lens.nats import InMemoryBroker, NatsBroker
+from tender_lens.schemas import TenderChangedV1
 from tender_lens.search import SearchService
 
 pytestmark = pytest.mark.e2e
@@ -37,6 +42,9 @@ def e2e_settings(tmp_path_factory) -> Settings:
         http_base_delay_seconds=0,
         http_jitter_seconds=0,
         max_attachment_bytes=2_000_000,
+        nats_stream_name="TENDERS_E2E",
+        nats_subject="tender.changed.e2e",
+        nats_consumer_name="INDEXER_E2E",
     )
 
 
@@ -159,3 +167,99 @@ async def test_repeat_fixture_crawl_does_not_create_duplicate_event(
         await service.run_source(FixtureAdapter("ted", fixture_dir / "ted_search_response.json"), 5)
     assert first_count == 1
     assert len(broker.events) == 1
+
+
+@pytest.mark.asyncio
+async def test_real_nats_to_indexer_to_protected_api_pipeline(
+    e2e_settings,
+    e2e_sessions,
+    fixture_dir,
+):
+    pdf = (fixture_dir / "sample_tender.pdf").read_bytes()
+    xml = (fixture_dir / "sample_notice.xml").read_bytes()
+    broker = NatsBroker(e2e_settings)
+    await broker.connect()
+    await broker._js.purge_stream(e2e_settings.nats_stream_name)  # type: ignore[union-attr]
+
+    async with httpx.AsyncClient(transport=fixture_transport(pdf, xml)) as raw:
+        attachment_client = ResilientHttpClient(
+            max_concurrency=2,
+            timeout_seconds=2,
+            max_attempts=1,
+            base_delay_seconds=0,
+            jitter_seconds=0,
+            user_agent="e2e",
+            allowed_hosts={"ted.europa.eu"},
+            client=raw,
+        )
+        crawler = CrawlerService(
+            settings=e2e_settings,
+            session_factory=e2e_sessions,
+            attachment_client=attachment_client,
+            publisher=broker,
+        )
+        summary = await crawler.run_source(
+            FixtureAdapter("ted", fixture_dir / "ted_search_response.json"),
+            max_items=1,
+        )
+
+    iterator = broker.iter_messages(timeout=0.2)
+    message = await asyncio.wait_for(anext(iterator), timeout=5)
+    event = TenderChangedV1.model_validate_json(message.data)
+    ai = FakeAIProvider(1024)
+    indexed = await IndexerService(
+        settings=e2e_settings,
+        session_factory=e2e_sessions,
+        ai=ai,
+    ).process(event)
+    await message.ack()
+    await iterator.aclose()
+
+    async with e2e_sessions() as session:
+        session.add(
+            ApiKey(
+                name="e2e",
+                key_hash=hash_api_key("tl_e2e"),
+                enabled=True,
+                limit_per_minute=5,
+            )
+        )
+        await session.commit()
+
+    app = create_app(
+        settings=e2e_settings,
+        session_factory=e2e_sessions,
+        ai=ai,
+    )
+    async with app.router.lifespan_context(app):
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app, raise_app_exceptions=False),
+            base_url="http://test",
+            headers={"X-API-Key": "tl_e2e"},
+        ) as client:
+            search = await client.post(
+                "/api/v1/search",
+                json={"query": "server equipment storage warranty", "limit": 5},
+            )
+            ask = await client.post(
+                "/api/v1/ask",
+                json={"query": "server equipment storage warranty", "limit": 5},
+            )
+            extra = [
+                await client.post(
+                    "/api/v1/search",
+                    json={"query": "server equipment", "limit": 1},
+                )
+                for _ in range(4)
+            ]
+
+    await broker.close()
+    assert summary.events_published == 1
+    assert indexed.status == "ready"
+    assert search.status_code == 200
+    assert search.json()["items"]
+    assert "Retry-After" not in search.headers
+    assert ask.status_code == 200
+    assert ask.json()["sources"]
+    assert [response.status_code for response in extra] == [200, 200, 200, 429]
+    assert int(extra[-1].headers["Retry-After"]) >= 1

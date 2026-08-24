@@ -54,10 +54,10 @@ class IndexerService:
                 ),
             )
 
-    async def _mark_failed(self, tender_id: UUID, message: str) -> None:
+    async def _mark_failed(self, tender_id: UUID, content_hash: str, message: str) -> None:
         async with self._session_factory() as session:
             tender = await session.get(Tender, tender_id, with_for_update=True)
-            if tender is not None:
+            if tender is not None and tender.content_hash == content_hash:
                 tender.index_status = "failed"
                 tender.last_error = message[:4000]
                 await session.commit()
@@ -142,5 +142,5 @@ class IndexerService:
                 await session.commit()
             return IndexResult(tender.id, "ready", len(new_chunks), warnings)
         except Exception as exc:
-            await self._mark_failed(tender.id, str(exc))
+            await self._mark_failed(tender.id, event.content_hash, str(exc))
             raise

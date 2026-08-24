@@ -83,7 +83,9 @@ def create_app(
         application.state.settings = settings
         application.state.session_factory = actual_sessions
         application.state.ai = actual_ai
-        application.state.search_service = search_service or SearchService(actual_ai)
+        application.state.search_service = search_service or SearchService(
+            actual_ai, settings.min_relevance_score
+        )
         yield
         if owns_ai and isinstance(actual_ai, OllamaAIProvider):
             await actual_ai.aclose()

@@ -15,12 +15,19 @@ pytestmark = pytest.mark.integration
 async def test_jetstream_publish_consume_and_ack(integration_settings):
     broker = NatsBroker(integration_settings)
     await broker.connect()
+    await broker._js.purge_stream(integration_settings.nats_stream_name)  # type: ignore[union-attr]
     event = TenderChangedV1(tender_id=UUID(int=1), content_hash="a" * 64)
     await broker.publish_tender_changed(event)
     iterator = broker.iter_messages(timeout=0.2)
     message = await asyncio.wait_for(anext(iterator), timeout=5)
     parsed = TenderChangedV1.model_validate_json(message.data)
     assert parsed.event_id == event.event_id
+    info = await broker._js.consumer_info(  # type: ignore[union-attr]
+        integration_settings.nats_stream_name,
+        integration_settings.nats_consumer_name,
+    )
+    assert info.config.ack_wait == integration_settings.nats_ack_wait_seconds
+    assert info.config.max_deliver == integration_settings.nats_max_deliver
     await message.ack()
     await iterator.aclose()
     await broker.close()

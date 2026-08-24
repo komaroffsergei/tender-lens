@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from math import ceil
 from uuid import UUID
 
 from fastapi import Depends, Request
@@ -22,13 +23,15 @@ class RateLimitState:
 
     @property
     def headers(self) -> dict[str, str]:
-        retry_after = max(0, int((self.reset_at - datetime.now(UTC)).total_seconds()))
         return {
             "X-RateLimit-Limit": str(self.limit),
             "X-RateLimit-Remaining": str(self.remaining),
             "X-RateLimit-Reset": str(int(self.reset_at.timestamp())),
-            "Retry-After": str(retry_after),
         }
+
+    def exceeded_headers(self, now: datetime) -> dict[str, str]:
+        retry_after = max(1, ceil((self.reset_at - now).total_seconds()))
+        return {**self.headers, "Retry-After": str(retry_after)}
 
 
 def minute_start(now: datetime) -> datetime:
@@ -62,7 +65,7 @@ async def consume_rate_limit(
             "rate_limit_exceeded",
             "Превышен лимит запросов.",
             429,
-            details={"headers": state.headers},
+            details={"headers": state.exceeded_headers(current)},
         )
 
     api_key.request_count += 1

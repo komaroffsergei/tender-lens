@@ -77,6 +77,10 @@ jobs:
         run: python -m alembic upgrade head
       - run: python -m pytest -q -m integration tests/integration
       - run: python -m pytest -q -m e2e tests/e2e
+      - name: Verify reversible migration
+        run: |
+          python -m alembic downgrade base
+          python -m alembic upgrade head
 
   container:
     runs-on: ubuntu-24.04
@@ -85,3 +89,9 @@ jobs:
       - run: cp .env.example .env
       - run: docker compose config --quiet
       - run: docker build -t tender-lens:ci .
+      - name: Smoke application roles
+        run: |
+          test "$(docker inspect tender-lens:ci --format '{{.Config.User}}')" = "app"
+          docker run --rm tender-lens:ci python -m tender_lens.crawler --help
+          docker run --rm tender-lens:ci python -m tender_lens.indexer --help
+          docker run --rm tender-lens:ci python -c "from tender_lens.api.main import create_app; assert create_app().title == 'TenderLens API'"

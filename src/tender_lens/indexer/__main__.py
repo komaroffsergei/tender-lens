@@ -2,20 +2,27 @@
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 import logging
 
 from pydantic import ValidationError
+from sqlalchemy.exc import SQLAlchemyError
 
 from tender_lens.ai import FakeAIProvider, OllamaAIProvider
 from tender_lens.config import get_settings
 from tender_lens.db import create_engine, create_session_factory
+from tender_lens.errors import DependencyUnavailableError
 from tender_lens.indexer.service import IndexerService
 from tender_lens.logging import configure_logging
 from tender_lens.nats import NatsBroker
 from tender_lens.schemas import TenderChangedV1
 
 logger = logging.getLogger(__name__)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    return argparse.ArgumentParser(description="Фоновая индексация закупок TenderLens")
 
 
 async def run() -> None:
@@ -43,7 +50,7 @@ async def run() -> None:
                 event = TenderChangedV1.model_validate_json(message.data)
             except ValidationError:
                 logger.error("Некорректный NATS event удалён из очереди", exc_info=True)
-                await message.ack()
+                await message.term()
                 continue
             try:
                 result = await service.process(event)
@@ -54,13 +61,20 @@ async def run() -> None:
                     extra={"event_id": str(event.event_id), "tender_id": str(event.tender_id)},
                 )
                 await message.ack()
-            except Exception:
+            except (DependencyUnavailableError, SQLAlchemyError, OSError):
                 logger.error(
                     "Индексация завершилась ошибкой; событие будет доставлено повторно",
                     extra={"event_id": str(event.event_id), "tender_id": str(event.tender_id)},
                     exc_info=True,
                 )
                 await message.nak(delay=10)
+            except Exception:
+                logger.error(
+                    "Постоянная ошибка индексации; повторная доставка остановлена",
+                    extra={"event_id": str(event.event_id), "tender_id": str(event.tender_id)},
+                    exc_info=True,
+                )
+                await message.term()
     finally:
         if isinstance(ai, OllamaAIProvider):
             await ai.aclose()
@@ -69,6 +83,7 @@ async def run() -> None:
 
 
 def main() -> None:
+    build_parser().parse_args()
     asyncio.run(run())
 
 

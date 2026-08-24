@@ -27,6 +27,9 @@ class NatsMessage:
         else:
             await self._raw.nak(delay=delay)
 
+    async def term(self) -> None:
+        await self._raw.term()
+
 
 class NatsBroker:
     def __init__(self, settings: Settings) -> None:
@@ -98,10 +101,26 @@ class NatsBroker:
         if self._js is None:
             raise RuntimeError("NATS connection не инициализирован")
         try:
+            from nats.js.api import AckPolicy, ConsumerConfig
+
+            consumer_config = ConsumerConfig(
+                durable_name=self._settings.nats_consumer_name,
+                ack_policy=AckPolicy.EXPLICIT,
+                ack_wait=self._settings.nats_ack_wait_seconds,
+                max_deliver=self._settings.nats_max_deliver,
+                filter_subject=self._settings.nats_subject,
+            )
+            # add_consumer идемпотентно создаёт или обновляет изменяемую
+            # конфигурацию уже существующего durable consumer.
+            await self._js.add_consumer(
+                self._settings.nats_stream_name,
+                config=consumer_config,
+            )
             subscription = await self._js.pull_subscribe(
                 self._settings.nats_subject,
                 durable=self._settings.nats_consumer_name,
                 stream=self._settings.nats_stream_name,
+                config=consumer_config,
             )
         except Exception as exc:
             raise DependencyUnavailableError("Не удалось создать NATS consumer.") from exc
