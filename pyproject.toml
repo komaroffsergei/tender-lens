@@ -74,5 +74,5 @@ plugins = ["pydantic.mypy"]
 exclude = ["migrations"]
 
 [[tool.mypy.overrides]]
-module = ["nats.*", "pgvector.*", "pypdf.*"]
+module = ["defusedxml.*", "nats.*", "pgvector.*", "pypdf.*"]
 ignore_missing_imports = true

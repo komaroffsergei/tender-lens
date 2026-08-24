@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 import logging
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from tender_lens.crawler.base import ResilientHttpClient, SourcePage
 from tender_lens.schemas import AttachmentRecordV1, TenderRecordV1
@@ -130,7 +130,8 @@ class TedAdapter:
         if not external_id or not title:
             raise ValueError("TED notice не содержит publication-number/title")
 
-        links = notice.get("links") if isinstance(notice.get("links"), dict) else {}
+        raw_links = notice.get("links")
+        links = cast(dict[str, Any], raw_links) if isinstance(raw_links, dict) else {}
         html_url = _string(links.get("html")) or (
             f"https://ted.europa.eu/en/notice/-/detail/{external_id}"
         )

@@ -112,9 +112,9 @@ class ResilientHttpClient:
                     if retry_at is not None:
                         if retry_at.tzinfo is None:
                             retry_at = retry_at.replace(tzinfo=UTC)
-                        return max(0.0, (retry_at - datetime.now(UTC)).total_seconds())
+                        return float(max(0.0, (retry_at - datetime.now(UTC)).total_seconds()))
         exponential = self._base_delay * (2 ** max(0, attempt - 1))
-        return exponential + self._jitter * self._random()
+        return float(exponential + self._jitter * self._random())
 
     async def _polite_delay(self) -> None:
         delay = self._base_delay + self._jitter * self._random()

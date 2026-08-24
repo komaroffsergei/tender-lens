@@ -154,12 +154,8 @@ async def test_repeat_fixture_crawl_does_not_create_duplicate_event(
             attachment_client=client,
             publisher=broker,
         )
-        await service.run_source(
-            FixtureAdapter("ted", fixture_dir / "ted_search_response.json"), 5
-        )
+        await service.run_source(FixtureAdapter("ted", fixture_dir / "ted_search_response.json"), 5)
         first_count = len(broker.events)
-        await service.run_source(
-            FixtureAdapter("ted", fixture_dir / "ted_search_response.json"), 5
-        )
+        await service.run_source(FixtureAdapter("ted", fixture_dir / "ted_search_response.json"), 5)
     assert first_count == 1
     assert len(broker.events) == 1

@@ -6,13 +6,21 @@ from datetime import UTC, datetime
 import logging
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from urllib.parse import parse_qs, urlparse
 
 from tender_lens.crawler.base import ResilientHttpClient, SourcePage
 from tender_lens.schemas import AttachmentRecordV1, TenderRecordV1
 
 logger = logging.getLogger(__name__)
+
+
+def _object(value: Any) -> dict[str, Any]:
+    return cast(dict[str, Any], value) if isinstance(value, dict) else {}
+
+
+def _array(value: Any) -> list[Any]:
+    return value if isinstance(value, list) else []
 
 
 def _dt(value: Any) -> datetime | None:
@@ -37,7 +45,7 @@ def _money(value: Any) -> Decimal | None:
 
 
 def _next_cursor(data: dict[str, Any]) -> str | None:
-    links = data.get("links") if isinstance(data.get("links"), dict) else {}
+    links = _object(data.get("links"))
     next_url = links.get("next")
     if not isinstance(next_url, str):
         return None
@@ -80,15 +88,11 @@ class ContractsFinderAdapter:
 
     @staticmethod
     def map_release(release: dict[str, Any]) -> TenderRecordV1:
-        tender = release.get("tender") if isinstance(release.get("tender"), dict) else {}
-        buyer = release.get("buyer") if isinstance(release.get("buyer"), dict) else {}
-        value = tender.get("value") if isinstance(tender.get("value"), dict) else {}
-        period = (
-            tender.get("tenderPeriod")
-            if isinstance(tender.get("tenderPeriod"), dict)
-            else {}
-        )
-        links = release.get("links") if isinstance(release.get("links"), dict) else {}
+        tender = _object(release.get("tender"))
+        buyer = _object(release.get("buyer"))
+        value = _object(tender.get("value"))
+        period = _object(tender.get("tenderPeriod"))
+        links = _object(release.get("links"))
 
         external_id = str(
             tender.get("id") or release.get("ocid") or release.get("id") or ""
@@ -98,7 +102,7 @@ class ContractsFinderAdapter:
             raise ValueError("Contracts Finder release не содержит id/title")
 
         attachments: list[AttachmentRecordV1] = []
-        documents = tender.get("documents") if isinstance(tender.get("documents"), list) else []
+        documents = _array(tender.get("documents"))
         for document in documents:
             if not isinstance(document, dict) or not document.get("url"):
                 continue
@@ -122,9 +126,9 @@ class ContractsFinderAdapter:
             source="contracts_finder",
             external_id=external_id,
             title=title,
-            description=str(tender.get("description")).strip()
-            if tender.get("description")
-            else None,
+            description=(
+                str(tender.get("description")).strip() if tender.get("description") else None
+            ),
             buyer_name=str(buyer.get("name")).strip() if buyer.get("name") else None,
             amount=_money(value.get("amount")),
             currency=str(value.get("currency")).upper() if value.get("currency") else None,

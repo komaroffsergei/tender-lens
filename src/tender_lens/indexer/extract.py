@@ -58,9 +58,7 @@ def metadata_text(tender: Tender) -> TextUnit:
         ("Заказчик", tender.buyer_name),
         (
             "Сумма",
-            f"{tender.amount} {tender.currency or ''}"
-            if tender.amount is not None
-            else None,
+            f"{tender.amount} {tender.currency or ''}" if tender.amount is not None else None,
         ),
         ("Опубликовано", tender.published_at.isoformat() if tender.published_at else None),
         ("Срок подачи", tender.deadline.isoformat() if tender.deadline else None),

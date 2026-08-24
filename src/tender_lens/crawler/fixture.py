@@ -25,10 +25,9 @@ class FixtureAdapter:
         payload = json.loads(self._fixture_path.read_text(encoding="utf-8"))
         if self.source_code == "ted":
             items = payload.get("notices", [])
-            mapper = TedAdapter.map_notice
+            records = [TedAdapter.map_notice(item) for item in items[:limit]]
         else:
             items = payload.get("releases", [])
-            mapper = ContractsFinderAdapter.map_release
-        records = [mapper(item) for item in items[:limit]]
+            records = [ContractsFinderAdapter.map_release(item) for item in items[:limit]]
         self._used = True
         return SourcePage(records=records, next_cursor=None)

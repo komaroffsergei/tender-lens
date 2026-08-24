@@ -305,9 +305,7 @@ def test_unknown_tender_is_404():
     app.dependency_overrides[authenticate_api_key] = allow_auth
     app.dependency_overrides[get_session] = empty_session_override
     with client:
-        response = client.get(
-            f"/api/v1/tenders/{UUID(int=99)}", headers={"X-API-Key": "x"}
-        )
+        response = client.get(f"/api/v1/tenders/{UUID(int=99)}", headers={"X-API-Key": "x"})
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "not_found"
 

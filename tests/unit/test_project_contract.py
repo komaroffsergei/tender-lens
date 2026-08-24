@@ -33,6 +33,12 @@ def test_default_settings_are_valid(tmp_path):
     assert settings.default_rate_limit_per_minute == 5
 
 
+def test_example_environment_file_is_valid(project_root):
+    settings = Settings(_env_file=project_root / ".env.example")
+    assert settings.embedding_dimensions == 1024
+    assert settings.database_url.endswith("@postgres:5432/tender_lens")
+
+
 @pytest.mark.parametrize(
     "field,value",
     [
@@ -41,6 +47,7 @@ def test_default_settings_are_valid(tmp_path):
         ("max_attachment_bytes", 10),
         ("default_rate_limit_per_minute", 0),
         ("api_port", 70000),
+        ("embedding_dimensions", 768),
     ],
 )
 def test_invalid_settings_are_rejected(field, value):

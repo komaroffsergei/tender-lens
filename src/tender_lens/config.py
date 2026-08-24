@@ -23,16 +23,15 @@ class Settings(BaseSettings):
     app_env: Literal["local", "test", "production"] = "local"
     log_level: str = "INFO"
 
-    database_url: str = (
-        "postgresql+asyncpg://tender_lens:tender_lens@localhost:5432/tender_lens"
-    )
+    database_url: str = "postgresql+asyncpg://tender_lens:tender_lens@localhost:5432/tender_lens"
     nats_url: str = "nats://localhost:4222"
     ollama_url: str = "http://localhost:11434"
 
     ai_mode: Literal["live", "fake"] = "fake"
     embedding_model: str = "qwen3-embedding:0.6b"
-    # Размерность зафиксирована схемой PostgreSQL VECTOR(1024).
-    embedding_dimensions: Literal[1024] = 1024
+    # Размерность зафиксирована схемой PostgreSQL VECTOR(1024). Тип int нужен,
+    # чтобы pydantic-settings мог корректно разобрать строковое значение из .env.
+    embedding_dimensions: int = Field(default=1024)
     generation_model: str = "qwen3:1.7b"
 
     attachments_dir: Path = Path("./data/attachments")
@@ -74,6 +73,13 @@ class Settings(BaseSettings):
     @classmethod
     def normalize_log_level(cls, value: str) -> str:
         return value.upper()
+
+    @field_validator("embedding_dimensions")
+    @classmethod
+    def validate_embedding_dimensions(cls, value: int) -> int:
+        if value != 1024:
+            raise ValueError("embedding_dimensions должна быть равна 1024")
+        return value
 
 
 @lru_cache(maxsize=1)

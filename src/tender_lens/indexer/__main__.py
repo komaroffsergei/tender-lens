@@ -48,7 +48,9 @@ async def run() -> None:
             try:
                 result = await service.process(event)
                 logger.info(
-                    "Индексация завершена: %s (%s chunks)", result.status, result.chunks,
+                    "Индексация завершена: %s (%s chunks)",
+                    result.status,
+                    result.chunks,
                     extra={"event_id": str(event.event_id), "tender_id": str(event.tender_id)},
                 )
                 await message.ack()

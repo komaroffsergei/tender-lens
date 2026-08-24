@@ -107,8 +107,7 @@ def test_long_text_respects_limit_and_overlap():
     assert len(chunks) > 2
     assert all(len(item.content) <= 300 for item in chunks)
     assert any(
-        chunks[index].content[-20:] in chunks[index + 1].content
-        for index in range(len(chunks) - 1)
+        chunks[index].content[-20:] in chunks[index + 1].content for index in range(len(chunks) - 1)
     )
 
 

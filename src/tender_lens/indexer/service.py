@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from typing import cast
 from uuid import UUID
 
 from sqlalchemy import delete, select
@@ -44,10 +45,13 @@ class IndexerService:
 
     async def _load_tender(self, tender_id: UUID) -> Tender | None:
         async with self._session_factory() as session:
-            return await session.scalar(
-                select(Tender)
-                .where(Tender.id == tender_id)
-                .options(selectinload(Tender.attachments))
+            return cast(
+                Tender | None,
+                await session.scalar(
+                    select(Tender)
+                    .where(Tender.id == tender_id)
+                    .options(selectinload(Tender.attachments))
+                ),
             )
 
     async def _mark_failed(self, tender_id: UUID, message: str) -> None:

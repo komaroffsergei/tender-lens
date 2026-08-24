@@ -98,9 +98,7 @@ async def tender_details(tender_id: UUID, session=Depends(get_session)) -> Tende
     tags=["search"],
 )
 async def search(request: Request, payload: SearchRequest, session=Depends(get_session)):
-    response = await request.app.state.search_service.search(
-        session, payload.query, payload.limit
-    )
+    response = await request.app.state.search_service.search(session, payload.query, payload.limit)
     headers = request.state.rate_limit.headers
     return JSONResponse(content=response.model_dump(mode="json"), headers=headers)
 

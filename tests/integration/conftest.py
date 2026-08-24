@@ -5,6 +5,7 @@ import os
 import pytest
 import pytest_asyncio
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from tender_lens.config import Settings
 from tender_lens.db import create_engine, create_session_factory
@@ -33,20 +34,20 @@ def integration_settings() -> Settings:
     )
 
 
-@pytest_asyncio.fixture(scope="session")
-async def engine(integration_settings):
+@pytest_asyncio.fixture
+async def engine(integration_settings: Settings) -> AsyncEngine:
     value = create_engine(integration_settings)
     yield value
     await value.dispose()
 
 
-@pytest.fixture(scope="session")
-def session_factory(engine):
+@pytest.fixture
+def session_factory(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
     return create_session_factory(engine)
 
 
 @pytest_asyncio.fixture(autouse=True)
-async def clean_database(session_factory):
+async def clean_database(session_factory: async_sessionmaker[AsyncSession]) -> None:
     async with session_factory() as session:
         await session.execute(
             text("TRUNCATE TABLE chunks, attachments, tenders, sources, api_keys CASCADE")

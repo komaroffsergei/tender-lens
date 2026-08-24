@@ -90,25 +90,28 @@ async def run(args: argparse.Namespace) -> None:
                     else None
                 )
                 try:
-                    async with ResilientHttpClient(
-                        max_concurrency=settings.crawl_max_concurrency,
-                        timeout_seconds=settings.http_timeout_seconds,
-                        max_attempts=settings.http_max_attempts,
-                        base_delay_seconds=settings.http_base_delay_seconds,
-                        jitter_seconds=settings.http_jitter_seconds,
-                        user_agent=settings.user_agent,
-                        allowed_hosts=allowed,
-                        forbidden_cooldown_seconds=forbidden_cooldown,
-                    ) as source_client, ResilientHttpClient(
-                        max_concurrency=settings.attachment_max_concurrency,
-                        timeout_seconds=settings.http_timeout_seconds,
-                        max_attempts=settings.http_max_attempts,
-                        base_delay_seconds=settings.http_base_delay_seconds,
-                        jitter_seconds=settings.http_jitter_seconds,
-                        user_agent=settings.user_agent,
-                        allowed_hosts=allowed,
-                        forbidden_cooldown_seconds=forbidden_cooldown,
-                    ) as attachment_client:
+                    async with (
+                        ResilientHttpClient(
+                            max_concurrency=settings.crawl_max_concurrency,
+                            timeout_seconds=settings.http_timeout_seconds,
+                            max_attempts=settings.http_max_attempts,
+                            base_delay_seconds=settings.http_base_delay_seconds,
+                            jitter_seconds=settings.http_jitter_seconds,
+                            user_agent=settings.user_agent,
+                            allowed_hosts=allowed,
+                            forbidden_cooldown_seconds=forbidden_cooldown,
+                        ) as source_client,
+                        ResilientHttpClient(
+                            max_concurrency=settings.attachment_max_concurrency,
+                            timeout_seconds=settings.http_timeout_seconds,
+                            max_attempts=settings.http_max_attempts,
+                            base_delay_seconds=settings.http_base_delay_seconds,
+                            jitter_seconds=settings.http_jitter_seconds,
+                            user_agent=settings.user_agent,
+                            allowed_hosts=allowed,
+                            forbidden_cooldown_seconds=forbidden_cooldown,
+                        ) as attachment_client,
+                    ):
                         service = CrawlerService(
                             settings=settings,
                             session_factory=sessions,

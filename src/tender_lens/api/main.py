@@ -110,9 +110,7 @@ def create_app(
         return _error_response(request, error)
 
     @application.exception_handler(RequestValidationError)
-    async def validation_handler(
-        request: Request, error: RequestValidationError
-    ) -> JSONResponse:
+    async def validation_handler(request: Request, error: RequestValidationError) -> JSONResponse:
         app_error = AppError(
             "validation_error",
             "Запрос не прошёл валидацию.",

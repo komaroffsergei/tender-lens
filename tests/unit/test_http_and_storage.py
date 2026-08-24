@@ -69,9 +69,7 @@ async def test_http_concurrency_is_bounded():
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as raw:
         client = make_client(raw, max_concurrency=2, attempts=1)
-        await asyncio.gather(
-            *(client.get_json("https://example.test/data") for _ in range(8))
-        )
+        await asyncio.gather(*(client.get_json("https://example.test/data") for _ in range(8)))
     assert maximum <= 2
 
 
@@ -249,9 +247,7 @@ async def test_redirect_to_allowed_host_is_followed():
         return httpx.Response(200, json={"ok": True})
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as raw:
-        result = await make_client(raw, attempts=2).get_json(
-            "https://example.test/start"
-        )
+        result = await make_client(raw, attempts=2).get_json("https://example.test/start")
 
     assert result == {"ok": True}
     assert paths == ["/start", "/final"]
