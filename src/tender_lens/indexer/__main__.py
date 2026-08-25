@@ -40,6 +40,7 @@ async def run() -> None:
             embedding_model=settings.embedding_model,
             generation_model=settings.generation_model,
             dimensions=settings.embedding_dimensions,
+            timeout_seconds=settings.ollama_timeout_seconds,
         )
     )
     service = IndexerService(settings=settings, session_factory=sessions, ai=ai)

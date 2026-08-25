@@ -66,6 +66,16 @@ class ChangeTenderThenFailAI:
         return True
 
 
+class RecordingBatchAI(FakeAIProvider):
+    def __init__(self, dimensions: int) -> None:
+        super().__init__(dimensions)
+        self.batch_sizes: list[int] = []
+
+    async def embed(self, texts: list[str]) -> list[list[float]]:
+        self.batch_sizes.append(len(texts))
+        return await super().embed(texts)
+
+
 def record(title: str = "Server equipment and storage") -> TenderRecordV1:
     return TenderRecordV1(
         source="ted",
@@ -251,6 +261,35 @@ async def test_indexer_idempotency_and_exact_search(session_factory, integration
     assert count == first.chunks
     assert result.items
     assert result.items[0].tender_id == persisted.tender_id
+
+
+@pytest.mark.asyncio
+async def test_indexer_batches_embeddings(session_factory, integration_settings):
+    crawler = CrawlerService(
+        settings=integration_settings,
+        session_factory=session_factory,
+        attachment_client=UnusedAttachmentClient(),  # type: ignore[arg-type]
+        publisher=InMemoryBroker(),
+    )
+    persisted = await crawler.persist_record(record())
+    ai = RecordingBatchAI(1024)
+    settings = integration_settings.model_copy(update={"embedding_batch_size": 2})
+
+    result = await IndexerService(
+        settings=settings,
+        session_factory=session_factory,
+        ai=ai,
+    ).process(
+        TenderChangedV1(
+            tender_id=persisted.tender_id,
+            content_hash=persisted.content_hash,
+        )
+    )
+
+    assert result.status == "ready"
+    assert len(ai.batch_sizes) >= 2
+    assert max(ai.batch_sizes) <= 2
+    assert sum(ai.batch_sizes) == result.chunks
 
 
 @pytest.mark.asyncio

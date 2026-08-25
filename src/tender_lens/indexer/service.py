@@ -108,7 +108,14 @@ class IndexerService:
             drafts = chunk_units(units, max_chars=1500, overlap_chars=150)
             if not drafts:
                 raise RuntimeError("После извлечения не создано ни одного чанка")
-            embeddings = await self._ai.embed([item.content for item in drafts])
+            embeddings: list[list[float]] = []
+            batch_size = self._settings.embedding_batch_size
+            for start in range(0, len(drafts), batch_size):
+                batch = drafts[start : start + batch_size]
+                batch_embeddings = await self._ai.embed([item.content for item in batch])
+                if len(batch_embeddings) != len(batch):
+                    raise RuntimeError("AI provider вернул неверное число embeddings в batch")
+                embeddings.extend(batch_embeddings)
             if len(embeddings) != len(drafts):
                 raise RuntimeError("AI provider вернул неверное число embeddings")
             for vector in embeddings:

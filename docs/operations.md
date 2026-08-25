@@ -11,6 +11,8 @@ DATABASE_URL=postgresql+asyncpg://tender_lens:tender_lens@postgres:5432/tender_l
 NATS_URL=nats://nats:4222
 AI_MODE=fake
 EMBEDDING_DIMENSIONS=1024
+EMBEDDING_BATCH_SIZE=8
+OLLAMA_TIMEOUT_SECONDS=300
 MIN_RELEVANCE_SCORE=0.20
 ATTACHMENTS_DIR=/data/attachments
 MAX_ATTACHMENT_BYTES=20971520
@@ -21,6 +23,9 @@ NATS_MAX_DELIVER=5
 ```
 
 `EMBEDDING_DIMENSIONS` читается из строкового env, но допускает только 1024, потому что migration создаёт `VECTOR(1024)`.
+Indexer отправляет embeddings пакетами по `EMBEDDING_BATCH_SIZE`, а
+`OLLAMA_TIMEOUT_SECONDS` ограничивает каждый запрос. Это сохраняет устойчивость
+CPU-only запуска при обработке больших PDF/XML.
 
 ## Первый запуск
 
