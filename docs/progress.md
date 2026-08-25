@@ -19,10 +19,10 @@ TenderLens доведён до публикуемого решения зада�
 
 | Область | Результат |
 |---|---|
-| Unit/API | 114 passed |
-| PostgreSQL/NATS integration | 13 passed |
+| Unit/API | 116 passed |
+| PostgreSQL/NATS integration | 14 passed |
 | Полный fixture E2E | 4 passed |
-| Полный локальный прогон | 131 passed |
+| Полный локальный прогон | 134 passed |
 | GitHub Actions | quality, integration и container jobs |
 | Публичный репозиторий | `komaroffsergei/tender-lens` |
 

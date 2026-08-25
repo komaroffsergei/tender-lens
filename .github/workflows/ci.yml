@@ -56,17 +56,24 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -r requirements-dev.lock
       - name: Start NATS JetStream
-        run: docker run -d --name tender-lens-nats -p 54222:4222 nats:2.10-alpine -js
+        run: |
+          docker rm -f tender-lens-nats >/dev/null 2>&1 || true
+          docker run -d --name tender-lens-nats -p 127.0.0.1::4222 nats:2.10-alpine -js
+          nats_port=$(docker inspect --format='{{(index (index .NetworkSettings.Ports "4222/tcp") 0).HostPort}}' tender-lens-nats)
+          echo "NATS_TEST_PORT=${nats_port}" >> "$GITHUB_ENV"
+          echo "TEST_NATS_URL=nats://127.0.0.1:${nats_port}" >> "$GITHUB_ENV"
       - name: Wait for NATS
         run: |
           python - <<'PY'
+          import os
           import socket
           import time
 
+          port = int(os.environ["NATS_TEST_PORT"])
           deadline = time.monotonic() + 30
           while time.monotonic() < deadline:
               try:
-                  with socket.create_connection(("127.0.0.1", 54222), timeout=1):
+                  with socket.create_connection(("127.0.0.1", port), timeout=1):
                       break
               except OSError:
                   time.sleep(1)
@@ -81,6 +88,9 @@ jobs:
         run: |
           python -m alembic downgrade base
           python -m alembic upgrade head
+      - name: Stop NATS
+        if: always()
+        run: docker rm -f tender-lens-nats >/dev/null 2>&1 || true
 
   container:
     runs-on: ubuntu-24.04

@@ -34,6 +34,8 @@ class Settings(BaseSettings):
     embedding_dimensions: int = Field(default=1024)
     generation_model: str = "qwen3:1.7b"
     min_relevance_score: float = Field(default=0.20, ge=-1.0, le=1.0)
+    embedding_batch_size: int = Field(default=8, ge=1, le=128)
+    ollama_timeout_seconds: float = Field(default=300.0, gt=0, le=3600)
 
     attachments_dir: Path = Path("./data/attachments")
     max_attachment_bytes: int = Field(default=20 * 1024 * 1024, ge=1024)

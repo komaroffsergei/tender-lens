@@ -78,6 +78,7 @@ def create_app(
                     embedding_model=settings.embedding_model,
                     generation_model=settings.generation_model,
                     dimensions=settings.embedding_dimensions,
+                    timeout_seconds=settings.ollama_timeout_seconds,
                 )
             )
         application.state.settings = settings
