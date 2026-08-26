@@ -1,44 +1,55 @@
-# Карта кода
+# Как пользоваться картой кода
 
-## Общие модули
+Reference-раздел — навигационный индекс, а не замена архитектурных объяснений. Он генерируется из текущего репозитория и поэтому отвечает на вопрос «какой файл/символ существует сейчас и где он реализован?».
 
-| Путь | Ответственность |
-|---|---|
-| `config.py` | типизированные env-настройки |
-| `schemas.py` | контракты источников, событий и API |
-| `models.py`, `db.py` | SQLAlchemy и async session |
-| `storage.py` | безопасная потоковая запись вложений |
-| `nats.py` | stream, publish и durable consumer |
-| `ai.py`, `search.py` | fake/Ollama, pgvector retrieval и RAG |
+## Четыре представления
 
-## Crawler
+| Страница | Содержимое | Когда открывать |
+|---|---|---|
+| [Дерево репозитория](reference/repository-tree.md) | каждый tracked-файл, назначение и GitHub link | незнакомая папка или filename |
+| [Python API](reference/python-api.md) | module → class → method/function, signature, lines | ищете реализацию поведения |
+| [Frontend API](reference/frontend-api.md) | DOM ids/sections, JS functions, CSS selectors | меняете UI без framework |
+| [Каталог тестов](reference/test-catalog.md) | test file → test case → уровень | ищете доказательство требования |
 
-| Путь | Ответственность |
-|---|---|
-| `crawler/base.py` | SourceAdapter и безопасная HTTP-политика |
-| `crawler/ted.py` | нормализация TED Search API |
-| `crawler/contracts_finder.py` | нормализация Contracts Finder OCDS |
-| `crawler/fixture.py` | offline adapter для тестов |
-| `crawler/service.py` | cursor, UPSERT, вложения и publish/republish |
-| `crawler/__main__.py` | CLI, source isolation и периодический цикл |
+## Направление чтения
 
-## Indexer и API
+```mermaid
+flowchart LR
+    QUESTION["Вопрос о поведении"] --> ARTICLE["Статья модуля"]
+    ARTICLE --> SYMBOL["Generated symbol"]
+    SYMBOL --> SOURCE["GitHub #Lx-Ly"]
+    SOURCE --> TEST["Каталог тестов"]
+```
 
-| Путь | Ответственность |
-|---|---|
-| `indexer/extract.py` | PDF/XML/HTML/JSON/TXT extraction |
-| `indexer/chunk.py` | детерминированный chunking |
-| `indexer/service.py` | атомарная и stale-safe индексация |
-| `api/auth.py` | hash-only API-key authentication |
-| `api/rate_limit.py` | PostgreSQL fixed-window limiter |
-| `api/routes.py`, `api/main.py` | HTTP-контракты, lifecycle и ошибки |
-| `web/` | статический адаптивный UI |
+Например, вопрос «почему старое событие безопасно?»:
 
-## Проверки
+1. [Indexer → Version-safe process](modules/indexer.md#version-safe-process);
+2. [`IndexerService.process()` в Python API](reference/python-api.md);
+3. [реализация на GitHub](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/indexer/service.py#L70-L151);
+4. поиск `stale_event` в [каталоге тестов](reference/test-catalog.md).
 
-| Путь | Уровень |
-|---|---|
-| `tests/unit/` | pure logic и HTTP mocks |
-| `tests/api/` | FastAPI in-process |
-| `tests/integration/` | PostgreSQL/pgvector и NATS |
-| `tests/e2e/` | полный fixture pipeline |
+## Что считается файлом
+
+Генератор читает `git ls-files`, то есть показывает только version-controlled content. Не попадают `.env`, `.venv`, Docker volumes, downloaded attachments, generated `site/` и IDE settings. Это отделяет архитектуру проекта от локального мусора.
+
+## Что извлекается автоматически
+
+- Python module docstring, imports, classes, methods, sync/async functions и decorators;
+- JS named functions;
+- HTML `id`, section и form controls;
+- CSS selectors;
+- test cases и pytest markers;
+- file line count, byte size и прямой URL GitHub.
+
+Описание файла берётся из явной project taxonomy, module docstring или безопасного fallback. Сгенерированные страницы нельзя править вручную.
+
+## Обновление
+
+```powershell
+python scripts/generate_code_reference.py
+python scripts/generate_code_reference.py --check
+python -m mkdocs build --strict
+python scripts/check_docs.py
+```
+
+`--check` ничего не пишет и завершается ошибкой при drift. Тот же порядок выполняет GitHub Actions.

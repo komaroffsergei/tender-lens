@@ -1,5 +1,7 @@
 # Тестирование
 
+Тестовая пирамида отделяет чистую логику от infrastructure contracts. Полный searchable список функций и source links находится в [каталоге тестов](reference/test-catalog.md).
+
 ## Уровни
 
 ### Unit и API
@@ -60,5 +62,18 @@ docker compose -f docker-compose.test.yml down
 | `quality` | Black, Flake8, MyPy, unit/API |
 | `integration` | clean migration, PostgreSQL, NATS, integration/E2E, downgrade/upgrade |
 | `container` | Compose config, Docker build, non-root и smoke трёх ролей |
+| `Documentation / build` | generated reference drift, strict MkDocs, source links и search index |
+| `Documentation / deploy` | публикация Pages artifact только из `main` |
 
 Live TED/Contracts Finder и real Ollama намеренно не входят в обязательный CI.
+
+## Документация
+
+```bash
+python -m pip install -r requirements-docs.lock
+python scripts/generate_code_reference.py --check
+python -m mkdocs build --strict
+python scripts/check_docs.py
+```
+
+Проверка гарантирует, что карта отражает текущий AST/tracked tree, ссылки `GitHub #Lx-Ly` не выходят за файл, а full-text index содержит ключевые понятия и symbols.
