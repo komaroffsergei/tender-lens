@@ -77,7 +77,6 @@
 </details>
 <details><summary>javascripts/</summary>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/docs/javascripts/docs.js" title="Добавляет Ctrl+K и управление раскрытием code tree.">docs.js</a>
-<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/docs/javascripts/mermaid.mjs" title="Инициализирует безопасный Mermaid rendering и instant navigation.">mermaid.mjs</a>
 </details>
 <details><summary>modules/</summary>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/api-and-rag.md" title="Статья документации: Search, RAG и API.">api-and-rag.md</a>
@@ -272,10 +271,9 @@
 | [docs/diagrams/pipeline-sequence.png](https://github.com/komaroffsergei/tender-lens/blob/main/docs/diagrams/pipeline-sequence.png) | documentation | Отрендеренная архитектурная иллюстрация для Markdown/README. | — | 65816 |
 | [docs/diagrams/README.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/diagrams/README.md) | documentation | Редактируемый исходник архитектурной диаграммы. | 9 | 917 |
 | [docs/getting-started.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/getting-started.md) | documentation | Статья документации: Первые 10 минут. | 120 | 5204 |
-| [docs/glossary.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/glossary.md) | documentation | Статья документации: Глоссарий. | 276 | 19405 |
+| [docs/glossary.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/glossary.md) | documentation | Статья документации: Глоссарий. | 276 | 19491 |
 | [docs/index.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/index.md) | documentation | Статья документации: Как устроен TenderLens. | 72 | 5899 |
 | [docs/javascripts/docs.js](https://github.com/komaroffsergei/tender-lens/blob/main/docs/javascripts/docs.js) | documentation | Добавляет Ctrl+K и управление раскрытием code tree. | 21 | 816 |
-| [docs/javascripts/mermaid.mjs](https://github.com/komaroffsergei/tender-lens/blob/main/docs/javascripts/mermaid.mjs) | documentation | Инициализирует безопасный Mermaid rendering и instant navigation. | 23 | 643 |
 | [docs/modules/api-and-rag.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/api-and-rag.md) | documentation | Статья документации: Search, RAG и API. | 83 | 6265 |
 | [docs/modules/core.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/core.md) | documentation | Статья документации: Конфигурация и домен. | 68 | 6352 |
 | [docs/modules/crawler.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/crawler.md) | documentation | Статья документации: Crawler. | 76 | 7309 |
@@ -324,7 +322,7 @@
 | [migrations/env.py](https://github.com/komaroffsergei/tender-lens/blob/main/migrations/env.py) | database | Подключает async SQLAlchemy engine и metadata к Alembic runtime. | 59 | 1625 |
 | [migrations/script.py.mako](https://github.com/komaroffsergei/tender-lens/blob/main/migrations/script.py.mako) | database | Шаблон новых Alembic revision files. | 24 | 593 |
 | [migrations/versions/0001_initial_schema.py](https://github.com/komaroffsergei/tender-lens/blob/main/migrations/versions/0001_initial_schema.py) | database | Создание минимальной схемы TenderLens. | 197 | 8482 |
-| [mkdocs.yml](https://github.com/komaroffsergei/tender-lens/blob/main/mkdocs.yml) | project | Структура, тема, поиск, extensions и navigation документационного сайта. | 135 | 4383 |
+| [mkdocs.yml](https://github.com/komaroffsergei/tender-lens/blob/main/mkdocs.yml) | project | Структура, тема, поиск, extensions и navigation документационного сайта. | 134 | 4355 |
 | [pyproject.toml](https://github.com/komaroffsergei/tender-lens/blob/main/pyproject.toml) | project | Package metadata, entrypoint и конфигурация Black/Pytest/MyPy. | 78 | 1946 |
 | [README.md](https://github.com/komaroffsergei/tender-lens/blob/main/README.md) | project | Краткая публичная входная страница repository. | 227 | 9990 |
 | [requirements-dev.lock](https://github.com/komaroffsergei/tender-lens/blob/main/requirements-dev.lock) | project | Pinned quality, typing и test dependencies. | 7 | 117 |
@@ -335,7 +333,7 @@
 | [scripts/check_docs.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/check_docs.py) | automation | Validate generated docs, exact GitHub line links, and built search content. | 80 | 2685 |
 | [scripts/demo_fake.sh](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/demo_fake.sh) | automation | Служебный automation script для demo, schema, docs или live smoke. | 73 | 2599 |
 | [scripts/export_schemas.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/export_schemas.py) | automation | Экспортирует JSON Schema из Pydantic-контрактов без ручного дублирования. | 68 | 2116 |
-| [scripts/generate_code_reference.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/generate_code_reference.py) | automation | Generate searchable repository, symbol, frontend, and test reference pages. | 637 | 29127 |
+| [scripts/generate_code_reference.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/generate_code_reference.py) | automation | Generate searchable repository, symbol, frontend, and test reference pages. | 637 | 29061 |
 | [scripts/live_smoke.sh](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/live_smoke.sh) | automation | Служебный automation script для demo, schema, docs или live smoke. | 13 | 440 |
 | [SECURITY.md](https://github.com/komaroffsergei/tender-lens/blob/main/SECURITY.md) | project | Security policy, threat boundaries и disclosure instructions. | 17 | 795 |
 | [src/tender_lens/__init__.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/__init__.py) | application | TenderLens: мониторинг закупок и локальный RAG. | 3 | 104 |

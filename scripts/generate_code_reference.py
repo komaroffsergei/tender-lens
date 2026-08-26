@@ -42,7 +42,6 @@ FILE_DESCRIPTIONS = {
     "requirements-docs.lock": "Pinned generator/theme stack документации.",
     "SECURITY.md": "Security policy, threat boundaries и disclosure instructions.",
     "docs/javascripts/docs.js": "Добавляет Ctrl+K и управление раскрытием code tree.",
-    "docs/javascripts/mermaid.mjs": "Инициализирует безопасный Mermaid rendering и instant navigation.",
     "docs/overrides/partials/source.html": "Рисует GitHub link без фонового GitHub API запроса.",
     "docs/stylesheets/extra.css": "Design tokens, layout и responsive стили документационного портала.",
     "docs/ui/search-wireframe-mobile.png": "Исходный мобильный wireframe пользовательского Search UI.",
@@ -104,6 +103,7 @@ def repository_files() -> list[Path]:
         path
         for path in paths
         if not any(part in {".venv", "site", "__pycache__"} for part in path.parts)
+        and ((ROOT / path).exists() or path in GENERATED_PATHS)
     ]
     # ``Path`` ordering follows the host path flavour. Use an explicit key so
     # mixed-case names such as README.md have one order on Windows and Linux.

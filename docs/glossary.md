@@ -155,7 +155,7 @@ search:
 : Static-site generator и его тема, из которых собирается этот инженерный портал. Markdown остаётся читаемым прямо в GitHub, а build добавляет навигацию, оглавление и локальный полнотекстовый поиск. [MkDocs](https://www.mkdocs.org/) · [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/).
 
 **Mermaid**
-: Текстовый язык диаграмм. Блоки `mermaid` в статьях рендерятся в браузере, поэтому схема меняется вместе с кодом без ручного редактирования PNG. Runtime загружается с закреплённой версией CDN; сами исходники схем хранятся в репозитории. [Документация](https://mermaid.js.org/intro/).
+: Текстовый язык диаграмм. Блоки `mermaid` в статьях рендерятся Material for MkDocs в браузере, поэтому схема меняется вместе с кодом без ручного редактирования PNG. Runtime Mermaid 11 загружается с CDN: для первого визуального render нужен интернет, но текст статьи и исходник схемы остаются доступны. [Документация](https://mermaid.js.org/intro/).
 
 **Model (двусмысленный термин)**
 : В `models.py` — ORM class/table; в AI-настройках — embedding/generation neural model; в Pydantic — validation schema. Контекст обязателен.
