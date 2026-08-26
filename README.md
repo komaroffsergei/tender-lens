@@ -1,12 +1,15 @@
 # TenderLens
 
 [![CI](https://github.com/komaroffsergei/tender-lens/actions/workflows/ci.yml/badge.svg)](https://github.com/komaroffsergei/tender-lens/actions/workflows/ci.yml)
+[![Documentation](https://github.com/komaroffsergei/tender-lens/actions/workflows/docs.yml/badge.svg)](https://komaroffsergei.github.io/tender-lens/)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 Асинхронный сервис мониторинга открытых закупок на Python. Основное тестовое задание — **№7: асинхронный парсер/скрапер сайтов**. Сервис получает закупки из TED и UK Contracts Finder, скачивает вложения и сохраняет нормализованные метаданные в PostgreSQL.
 
 RAG-поиск, API rate limiter и контейнеризация — дополнительные возможности, демонстрирующие части заданий №3, №8 и №9. Проект не заявляет выполнение остальных заданий вакансии.
+
+**Инженерная wiki:** [komaroffsergei.github.io/tender-lens](https://komaroffsergei.github.io/tender-lens/) — полнотекстовый поиск, архитектурные схемы, дерево каждого файла, каталог тестов и AST-карта всех Python-классов/функций со ссылками на точные строки.
 
 ![Архитектура TenderLens](docs/diagrams/architecture.png)
 
@@ -201,14 +204,23 @@ GitHub Actions проверяет Black, Flake8, MyPy, unit/API, PostgreSQL/pgve
 
 ## Документация
 
-- [Логика и алгоритмы](docs/algorithm.md)
-- [Архитектура](docs/architecture.md)
-- [Тестирование](docs/testing.md)
-- [Эксплуатация](docs/operations.md)
-- [Traceability задания](docs/traceability.md)
-- [Карта кода](docs/code-map.md)
-- [Компромиссы](docs/tradeoffs.md)
+- [Первые 10 минут](docs/getting-started.md)
+- [Обзор архитектуры](docs/architecture.md) и [потоки данных](docs/architecture/runtime-flows.md)
+- [Модули сверху вниз](docs/modules/crawler.md)
+- [Дерево каждого файла](docs/reference/repository-tree.md)
+- [Все Python-символы и строки](docs/reference/python-api.md)
+- [Тестирование](docs/testing.md) и [каталог тестов](docs/reference/test-catalog.md)
+- [Запуск с реальной LLM](docs/operations.md) и [диагностика](docs/operations/troubleshooting.md)
+- [Глоссарий](docs/glossary.md), [traceability](docs/traceability.md), [компромиссы](docs/tradeoffs.md)
 - [Безопасность](SECURITY.md)
+
+Локально открыть wiki:
+
+```bash
+python -m pip install -r requirements-docs.lock
+python scripts/generate_code_reference.py
+python -m mkdocs serve --dev-addr 127.0.0.1:8001
+```
 
 ## License
 

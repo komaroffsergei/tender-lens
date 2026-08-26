@@ -34,3 +34,4 @@ live-data/
 dist/
 build/
 *.egg-info/
+site/

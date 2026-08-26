@@ -1,0 +1,135 @@
+site_name: TenderLens Docs
+site_description: Инженерная документация асинхронной системы мониторинга закупок TenderLens
+site_url: https://komaroffsergei.github.io/tender-lens/
+repo_url: https://github.com/komaroffsergei/tender-lens
+repo_name: komaroffsergei/tender-lens
+edit_uri: edit/main/docs/
+copyright: TenderLens · MIT License · документация проверяется в CI
+
+theme:
+  name: material
+  language: ru
+  custom_dir: docs/overrides
+  logo: assets/images/logo.svg
+  favicon: assets/images/favicon.svg
+  font: false
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tooltips
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: tenderlens
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Включить тёмную тему
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Включить светлую тему
+
+plugins:
+  - search:
+      lang:
+        - ru
+        - en
+      separator: '[\\s\\-\\.\\_/]+'
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mermaid.mjs
+  - javascripts/docs.js
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/komaroffsergei/tender-lens
+      name: TenderLens на GitHub
+
+nav:
+  - Начало:
+      - Что делает TenderLens: index.md
+      - Первые 10 минут: getting-started.md
+      - Как читать документацию: reading-guide.md
+  - Архитектура:
+      - Обзор системы: architecture.md
+      - Потоки данных: architecture/runtime-flows.md
+      - Данные и контракты: architecture/data-and-contracts.md
+      - Безопасность и отказоустойчивость: architecture/security-and-resilience.md
+      - Решения и границы: decisions.md
+  - Модули:
+      - Конфигурация и домен: modules/core.md
+      - Crawler: modules/crawler.md
+      - Indexer: modules/indexer.md
+      - Search, RAG и API: modules/api-and-rag.md
+      - Инфраструктура: modules/infrastructure.md
+      - Web UI: modules/web-ui.md
+  - Карта кода:
+      - Как пользоваться картой: code-map.md
+      - Дерево репозитория: reference/repository-tree.md
+      - "Python: классы и функции": reference/python-api.md
+      - "Frontend: DOM, JS и CSS": reference/frontend-api.md
+      - Каталог тестов: reference/test-catalog.md
+  - API и эксплуатация:
+      - HTTP API: api-examples.md
+      - Запуск и реальная LLM: operations.md
+      - Диагностика: operations/troubleshooting.md
+      - Тестирование: testing.md
+  - Справочник:
+      - Глоссарий: glossary.md
+      - Состояние проекта: progress.md
+      - Алгоритмы: algorithm.md
+      - Компромиссы: tradeoffs.md
+      - Соответствие заданию: traceability.md
+      - Каталог диаграмм: diagrams/README.md
+      - UI-референсы: ui/README.md
+      - Поддержка документации: contributing-docs.md

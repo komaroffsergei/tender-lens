@@ -1,17 +1,20 @@
 PYTHON ?= python
 COMPOSE ?= docker compose
 
-.PHONY: install format lint typecheck test-unit test-integration test-e2e test ci migrate compose-up compose-down demo-fake live-smoke
+.PHONY: install install-docs format lint typecheck test-unit test-integration test-e2e test docs docs-check ci migrate compose-up compose-down demo-fake live-smoke
 
 install:
 	$(PYTHON) -m pip install -r requirements-dev.lock
 
+install-docs:
+	$(PYTHON) -m pip install -r requirements-docs.lock
+
 format:
-	$(PYTHON) -m black src tests migrations
+	$(PYTHON) -m black src tests migrations scripts
 
 lint:
-	$(PYTHON) -m black --check src tests migrations
-	$(PYTHON) -m flake8 src tests
+	$(PYTHON) -m black --check src tests migrations scripts
+	$(PYTHON) -m flake8 src tests scripts
 
 typecheck:
 	$(PYTHON) -m mypy src
@@ -27,7 +30,16 @@ test-e2e:
 
 test: test-unit test-integration test-e2e
 
-ci: lint test-unit
+docs:
+	$(PYTHON) scripts/generate_code_reference.py
+	$(PYTHON) -m mkdocs serve --dev-addr 127.0.0.1:8001
+
+docs-check:
+	$(PYTHON) scripts/generate_code_reference.py --check
+	$(PYTHON) -m mkdocs build --strict
+	$(PYTHON) scripts/check_docs.py
+
+ci: lint typecheck test-unit docs-check
 
 migrate:
 	$(PYTHON) -m alembic upgrade head
