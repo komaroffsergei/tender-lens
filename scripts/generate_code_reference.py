@@ -100,11 +100,14 @@ def repository_files() -> list[Path]:
     untracked = set(run_git("ls-files", "--others", "--exclude-standard").splitlines())
     paths = {Path(item) for item in tracked | untracked if item}
     paths.update(GENERATED_PATHS)
-    return sorted(
+    included = [
         path
         for path in paths
         if not any(part in {".venv", "site", "__pycache__"} for part in path.parts)
-    )
+    ]
+    # ``Path`` ordering follows the host path flavour. Use an explicit key so
+    # mixed-case names such as README.md have one order on Windows and Linux.
+    return sorted(included, key=lambda path: (path.as_posix().casefold(), path.as_posix()))
 
 
 def source_url(path: Path, start: int | None = None, end: int | None = None) -> str:
@@ -120,12 +123,14 @@ def text_info(path: Path) -> tuple[int | None, int]:
     absolute = ROOT / path
     if not absolute.exists():
         return 0, 0
-    size = absolute.stat().st_size
     try:
         content = absolute.read_text(encoding="utf-8")
     except (UnicodeDecodeError, OSError):
-        return None, size
-    return len(content.splitlines()), size
+        return None, absolute.stat().st_size
+    # ``read_text`` normalizes CRLF to LF. Counting the normalized UTF-8 bytes
+    # keeps the generated page identical on Windows and Linux checkouts.
+    normalized_size = len(content.encode("utf-8"))
+    return len(content.splitlines()), normalized_size
 
 
 def first_heading(content: str) -> str | None:
