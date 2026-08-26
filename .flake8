@@ -2,3 +2,5 @@
 max-line-length = 100
 extend-ignore = E203,W503
 exclude = .git,.venv,migrations/versions
+per-file-ignores =
+    scripts/generate_code_reference.py:E501
