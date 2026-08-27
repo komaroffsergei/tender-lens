@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import struct
 import subprocess
 import sys
 from pathlib import Path
@@ -90,17 +91,54 @@ def validate_dark_theme_tokens() -> list[str]:
     ]
 
 
+def validate_ui_screenshots() -> list[str]:
+    """Ensure the published gallery contains real PNG captures at expected viewports."""
+
+    expected_widths = {
+        "01-home-desktop.png": 1440,
+        "02-loading-desktop.png": 1440,
+        "03-search-results-desktop.png": 1440,
+        "04-ask-answer-desktop.png": 1440,
+        "05-validation-error-desktop.png": 1440,
+        "06-search-results-mobile.png": 390,
+        "07-ask-answer-mobile.png": 390,
+        "08-home-mobile.png": 390,
+    }
+    root = ROOT / "docs/ui/screenshots"
+    errors: list[str] = []
+    for name, expected_width in expected_widths.items():
+        path = root / name
+        if not path.is_file():
+            errors.append(f"UI screenshot is missing: {path.relative_to(ROOT)}")
+            continue
+        data = path.read_bytes()
+        if len(data) < 50_000:
+            errors.append(f"UI screenshot is unexpectedly small: {path.relative_to(ROOT)}")
+            continue
+        if data[:8] != b"\x89PNG\r\n\x1a\n" or len(data) < 24:
+            errors.append(f"UI screenshot is not a valid PNG: {path.relative_to(ROOT)}")
+            continue
+        width, height = struct.unpack(">II", data[16:24])
+        if width != expected_width or height < 800:
+            errors.append(
+                f"Unexpected UI screenshot dimensions for {name}: "
+                f"{width}x{height}, expected {expected_width}px wide and at least 800px high"
+            )
+    return errors
+
+
 def main() -> None:
     errors = (
         validate_reference()
         + validate_source_links()
         + validate_search_index()
         + validate_dark_theme_tokens()
+        + validate_ui_screenshots()
     )
     if errors:
         print("\n".join(f"ERROR: {item}" for item in errors))
         raise SystemExit(1)
-    print("Documentation reference, source links, and search index are valid.")
+    print("Documentation reference, source links, search index, and UI captures are valid.")
 
 
 if __name__ == "__main__":

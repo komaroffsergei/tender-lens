@@ -257,6 +257,93 @@ input {
   margin: 2.5rem 0 0;
 }
 
+.ui-proof-grid {
+  border: 1px solid var(--tl-line);
+  border-radius: .7rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 1.25rem 0 1.75rem;
+  overflow: hidden;
+}
+
+.ui-proof-grid > div {
+  align-items: center;
+  background: var(--tl-soft);
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  justify-content: center;
+  min-height: 5.2rem;
+  padding: .75rem;
+  text-align: center;
+}
+
+.ui-proof-grid > div + div {
+  border-left: 1px solid var(--tl-line);
+}
+
+.ui-proof-grid strong {
+  color: var(--tl-primary);
+  font-size: 1.1rem;
+}
+
+.ui-proof-grid span {
+  color: var(--tl-muted);
+  font-size: .67rem;
+}
+
+.ui-shot {
+  background: var(--tl-soft);
+  border: 1px solid var(--tl-line);
+  border-radius: .75rem;
+  box-shadow: 0 .45rem 1.4rem rgb(31 41 55 / 9%);
+  margin: 1rem 0 2rem;
+  overflow: hidden;
+}
+
+.ui-shot a {
+  background: #f4f7fb;
+  display: block;
+  line-height: 0;
+}
+
+.ui-shot img {
+  display: block;
+  height: auto;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.ui-shot--tall img {
+  max-height: 48rem;
+  object-fit: cover;
+  object-position: top;
+}
+
+.ui-shot figcaption {
+  color: var(--tl-muted);
+  font-size: .68rem;
+  line-height: 1.45;
+  padding: .7rem .9rem;
+}
+
+.ui-mobile-grid {
+  align-items: start;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ui-shot--mobile {
+  margin-top: 0;
+}
+
+.ui-shot--mobile img {
+  aspect-ratio: 390 / 760;
+  object-fit: cover;
+  object-position: top;
+}
+
 @media screen and (max-width: 76.234375em) {
   .tl-summary {
     grid-template-columns: repeat(2, 1fr);
@@ -268,6 +355,18 @@ input {
   }
 
   .tl-summary > div:nth-child(4) {
+    border-top: 1px solid var(--tl-line);
+  }
+
+  .ui-proof-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ui-proof-grid > div:nth-child(3) {
+    border-left: 0;
+  }
+
+  .ui-proof-grid > div:nth-child(n + 3) {
     border-top: 1px solid var(--tl-line);
   }
 }
@@ -302,5 +401,15 @@ input {
 
   .module-contract dd {
     padding-top: .2rem;
+  }
+
+  .ui-mobile-grid {
+    grid-template-columns: 1fr;
+    margin-inline: auto;
+    max-width: 24rem;
+  }
+
+  .ui-shot--mobile img {
+    aspect-ratio: 390 / 680;
   }
 }

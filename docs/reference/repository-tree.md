@@ -104,9 +104,19 @@
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/docs/stylesheets/extra.css" title="Design tokens, layout и responsive стили документационного портала.">extra.css</a>
 </details>
 <details><summary>ui/</summary>
-<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/README.md" title="Статья документации: UI reference.">README.md</a>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/README.md" title="Статья документации: Экраны работающего UI.">README.md</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/search-wireframe-mobile.png" title="Исходный мобильный wireframe пользовательского Search UI.">search-wireframe-mobile.png</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/search-wireframe.png" title="Исходный desktop wireframe пользовательского Search UI.">search-wireframe.png</a>
+<details><summary>screenshots/</summary>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/screenshots/01-home-desktop.png" title="Реальный desktop-снимок начального состояния работающего UI.">01-home-desktop.png</a>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/screenshots/02-loading-desktop.png" title="Реальный desktop-снимок состояния выполнения Search-запроса.">02-loading-desktop.png</a>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/screenshots/03-search-results-desktop.png" title="Реальный desktop-снимок пяти результатов векторного поиска.">03-search-results-desktop.png</a>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/screenshots/04-ask-answer-desktop.png" title="Реальный desktop-снимок Ask-ответа локальной Ollama и источников.">04-ask-answer-desktop.png</a>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/screenshots/05-validation-error-desktop.png" title="Реальный desktop-снимок ошибки формы без API-ключа.">05-validation-error-desktop.png</a>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/screenshots/06-search-results-mobile.png" title="Реальный mobile-снимок результатов Search при ширине 390 px.">06-search-results-mobile.png</a>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/screenshots/07-ask-answer-mobile.png" title="Реальный mobile-снимок Ask-ответа и источников при ширине 390 px.">07-ask-answer-mobile.png</a>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/screenshots/08-home-mobile.png" title="Реальный mobile-снимок начального responsive-состояния UI.">08-home-mobile.png</a>
+</details>
 </details>
 </details>
 <details open><summary>examples/</summary>
@@ -279,7 +289,7 @@
 | [docs/modules/crawler.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/crawler.md) | documentation | Статья документации: Crawler. | 76 | 7309 |
 | [docs/modules/indexer.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/indexer.md) | documentation | Статья документации: Indexer. | 72 | 5372 |
 | [docs/modules/infrastructure.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/infrastructure.md) | documentation | Статья документации: Инфраструктура. | 79 | 4443 |
-| [docs/modules/web-ui.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/web-ui.md) | documentation | Статья документации: Web UI. | 72 | 4003 |
+| [docs/modules/web-ui.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/web-ui.md) | documentation | Статья документации: Web UI. | 76 | 4276 |
 | [docs/operations.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/operations.md) | documentation | Статья документации: Запуск и реальная LLM. | 250 | 11029 |
 | [docs/operations/troubleshooting.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/operations/troubleshooting.md) | documentation | Статья документации: Диагностика. | 154 | 8162 |
 | [docs/overrides/partials/source.html](https://github.com/komaroffsergei/tender-lens/blob/main/docs/overrides/partials/source.html) | documentation | Рисует GitHub link без фонового GitHub API запроса. | 12 | 405 |
@@ -289,11 +299,19 @@
 | [docs/reference/python-api.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/reference/python-api.md) | documentation | Статья документации: Python: классы и функции. | — | 0 |
 | [docs/reference/repository-tree.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/reference/repository-tree.md) | documentation | Статья документации: Дерево репозитория. | — | 0 |
 | [docs/reference/test-catalog.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/reference/test-catalog.md) | documentation | Статья документации: Каталог тестов. | — | 0 |
-| [docs/stylesheets/extra.css](https://github.com/komaroffsergei/tender-lens/blob/main/docs/stylesheets/extra.css) | documentation | Design tokens, layout и responsive стили документационного портала. | 306 | 5451 |
+| [docs/stylesheets/extra.css](https://github.com/komaroffsergei/tender-lens/blob/main/docs/stylesheets/extra.css) | documentation | Design tokens, layout и responsive стили документационного портала. | 415 | 7295 |
 | [docs/testing.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/testing.md) | documentation | Статья документации: Тестирование. | 79 | 3197 |
 | [docs/traceability.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/traceability.md) | documentation | Статья документации: Соответствие тестовому заданию. | 27 | 2761 |
 | [docs/tradeoffs.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/tradeoffs.md) | documentation | Статья документации: Архитектурные компромиссы. | 89 | 4255 |
-| [docs/ui/README.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/README.md) | documentation | Статья документации: UI reference. | 6 | 444 |
+| [docs/ui/README.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/README.md) | documentation | Статья документации: Экраны работающего UI. | 154 | 9826 |
+| [docs/ui/screenshots/01-home-desktop.png](https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/screenshots/01-home-desktop.png) | documentation | Реальный desktop-снимок начального состояния работающего UI. | — | 98265 |
+| [docs/ui/screenshots/02-loading-desktop.png](https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/screenshots/02-loading-desktop.png) | documentation | Реальный desktop-снимок состояния выполнения Search-запроса. | — | 100539 |
+| [docs/ui/screenshots/03-search-results-desktop.png](https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/screenshots/03-search-results-desktop.png) | documentation | Реальный desktop-снимок пяти результатов векторного поиска. | — | 252827 |
+| [docs/ui/screenshots/04-ask-answer-desktop.png](https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/screenshots/04-ask-answer-desktop.png) | documentation | Реальный desktop-снимок Ask-ответа локальной Ollama и источников. | — | 279894 |
+| [docs/ui/screenshots/05-validation-error-desktop.png](https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/screenshots/05-validation-error-desktop.png) | documentation | Реальный desktop-снимок ошибки формы без API-ключа. | — | 105742 |
+| [docs/ui/screenshots/06-search-results-mobile.png](https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/screenshots/06-search-results-mobile.png) | documentation | Реальный mobile-снимок результатов Search при ширине 390 px. | — | 221333 |
+| [docs/ui/screenshots/07-ask-answer-mobile.png](https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/screenshots/07-ask-answer-mobile.png) | documentation | Реальный mobile-снимок Ask-ответа и источников при ширине 390 px. | — | 246597 |
+| [docs/ui/screenshots/08-home-mobile.png](https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/screenshots/08-home-mobile.png) | documentation | Реальный mobile-снимок начального responsive-состояния UI. | — | 72373 |
 | [docs/ui/search-wireframe-mobile.png](https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/search-wireframe-mobile.png) | documentation | Исходный мобильный wireframe пользовательского Search UI. | — | 55030 |
 | [docs/ui/search-wireframe.png](https://github.com/komaroffsergei/tender-lens/blob/main/docs/ui/search-wireframe.png) | documentation | Исходный desktop wireframe пользовательского Search UI. | — | 126053 |
 | [examples/api/ask-request.json](https://github.com/komaroffsergei/tender-lens/blob/main/examples/api/ask-request.json) | contract/example | Версионированный пример JSON HTTP-контракта. | 3 | 122 |
@@ -322,7 +340,7 @@
 | [migrations/env.py](https://github.com/komaroffsergei/tender-lens/blob/main/migrations/env.py) | database | Подключает async SQLAlchemy engine и metadata к Alembic runtime. | 59 | 1625 |
 | [migrations/script.py.mako](https://github.com/komaroffsergei/tender-lens/blob/main/migrations/script.py.mako) | database | Шаблон новых Alembic revision files. | 24 | 593 |
 | [migrations/versions/0001_initial_schema.py](https://github.com/komaroffsergei/tender-lens/blob/main/migrations/versions/0001_initial_schema.py) | database | Создание минимальной схемы TenderLens. | 197 | 8482 |
-| [mkdocs.yml](https://github.com/komaroffsergei/tender-lens/blob/main/mkdocs.yml) | project | Структура, тема, поиск, extensions и navigation документационного сайта. | 134 | 4355 |
+| [mkdocs.yml](https://github.com/komaroffsergei/tender-lens/blob/main/mkdocs.yml) | project | Структура, тема, поиск, extensions и navigation документационного сайта. | 134 | 4372 |
 | [pyproject.toml](https://github.com/komaroffsergei/tender-lens/blob/main/pyproject.toml) | project | Package metadata, entrypoint и конфигурация Black/Pytest/MyPy. | 78 | 1946 |
 | [README.md](https://github.com/komaroffsergei/tender-lens/blob/main/README.md) | project | Краткая публичная входная страница repository. | 227 | 9990 |
 | [requirements-dev.lock](https://github.com/komaroffsergei/tender-lens/blob/main/requirements-dev.lock) | project | Pinned quality, typing и test dependencies. | 7 | 117 |
@@ -330,10 +348,10 @@
 | [requirements.lock](https://github.com/komaroffsergei/tender-lens/blob/main/requirements.lock) | project | Pinned runtime dependencies Docker image. | 12 | 214 |
 | [schemas/tender-changed-v1.schema.json](https://github.com/komaroffsergei/tender-lens/blob/main/schemas/tender-changed-v1.schema.json) | contract/example | Checked-in JSON Schema, генерируемая из Pydantic contract. | 39 | 852 |
 | [schemas/tender-record-v1.schema.json](https://github.com/komaroffsergei/tender-lens/blob/main/schemas/tender-record-v1.schema.json) | contract/example | Checked-in JSON Schema, генерируемая из Pydantic contract. | 195 | 3789 |
-| [scripts/check_docs.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/check_docs.py) | automation | Validate generated docs, exact GitHub line links, and built search content. | 107 | 3391 |
+| [scripts/check_docs.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/check_docs.py) | automation | Validate generated docs, exact GitHub line links, and built search content. | 145 | 4922 |
 | [scripts/demo_fake.sh](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/demo_fake.sh) | automation | Служебный automation script для demo, schema, docs или live smoke. | 73 | 2599 |
 | [scripts/export_schemas.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/export_schemas.py) | automation | Экспортирует JSON Schema из Pydantic-контрактов без ручного дублирования. | 68 | 2116 |
-| [scripts/generate_code_reference.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/generate_code_reference.py) | automation | Generate searchable repository, symbol, frontend, and test reference pages. | 637 | 29061 |
+| [scripts/generate_code_reference.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/generate_code_reference.py) | automation | Generate searchable repository, symbol, frontend, and test reference pages. | 645 | 30300 |
 | [scripts/live_smoke.sh](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/live_smoke.sh) | automation | Служебный automation script для demo, schema, docs или live smoke. | 13 | 440 |
 | [SECURITY.md](https://github.com/komaroffsergei/tender-lens/blob/main/SECURITY.md) | project | Security policy, threat boundaries и disclosure instructions. | 17 | 795 |
 | [src/tender_lens/__init__.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/__init__.py) | application | TenderLens: мониторинг закупок и локальный RAG. | 3 | 104 |

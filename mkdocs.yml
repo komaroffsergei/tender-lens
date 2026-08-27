@@ -130,5 +130,5 @@ nav:
       - Компромиссы: tradeoffs.md
       - Соответствие заданию: traceability.md
       - Каталог диаграмм: diagrams/README.md
-      - UI-референсы: ui/README.md
+      - Экраны работающего UI: ui/README.md
       - Поддержка документации: contributing-docs.md
