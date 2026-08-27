@@ -68,8 +68,35 @@ def validate_search_index() -> list[str]:
     return [f"Search index misses required term: {term}" for term in required if term not in text]
 
 
+def validate_dark_theme_tokens() -> list[str]:
+    css = (ROOT / "docs/stylesheets/extra.css").read_text(encoding="utf-8")
+    match = re.search(r'\[data-md-color-scheme="slate"\]\s*\{([^}]+)\}', css, re.DOTALL)
+    if not match:
+        return ["Dark documentation palette is missing"]
+    required = (
+        "--tl-line",
+        "--tl-soft",
+        "--tl-muted",
+        "--tl-ink",
+        "--tl-primary",
+        "--tl-primary-soft",
+        "--tl-green",
+    )
+    body = match.group(1)
+    return [
+        f"Dark documentation palette misses token: {token}"
+        for token in required
+        if token not in body
+    ]
+
+
 def main() -> None:
-    errors = validate_reference() + validate_source_links() + validate_search_index()
+    errors = (
+        validate_reference()
+        + validate_source_links()
+        + validate_search_index()
+        + validate_dark_theme_tokens()
+    )
     if errors:
         print("\n".join(f"ERROR: {item}" for item in errors))
         raise SystemExit(1)

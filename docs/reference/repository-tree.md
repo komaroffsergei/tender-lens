@@ -289,7 +289,7 @@
 | [docs/reference/python-api.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/reference/python-api.md) | documentation | Статья документации: Python: классы и функции. | — | 0 |
 | [docs/reference/repository-tree.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/reference/repository-tree.md) | documentation | Статья документации: Дерево репозитория. | — | 0 |
 | [docs/reference/test-catalog.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/reference/test-catalog.md) | documentation | Статья документации: Каталог тестов. | — | 0 |
-| [docs/stylesheets/extra.css](https://github.com/komaroffsergei/tender-lens/blob/main/docs/stylesheets/extra.css) | documentation | Design tokens, layout и responsive стили документационного портала. | 296 | 5249 |
+| [docs/stylesheets/extra.css](https://github.com/komaroffsergei/tender-lens/blob/main/docs/stylesheets/extra.css) | documentation | Design tokens, layout и responsive стили документационного портала. | 306 | 5451 |
 | [docs/testing.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/testing.md) | documentation | Статья документации: Тестирование. | 79 | 3197 |
 | [docs/traceability.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/traceability.md) | documentation | Статья документации: Соответствие тестовому заданию. | 27 | 2761 |
 | [docs/tradeoffs.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/tradeoffs.md) | documentation | Статья документации: Архитектурные компромиссы. | 89 | 4255 |
@@ -330,7 +330,7 @@
 | [requirements.lock](https://github.com/komaroffsergei/tender-lens/blob/main/requirements.lock) | project | Pinned runtime dependencies Docker image. | 12 | 214 |
 | [schemas/tender-changed-v1.schema.json](https://github.com/komaroffsergei/tender-lens/blob/main/schemas/tender-changed-v1.schema.json) | contract/example | Checked-in JSON Schema, генерируемая из Pydantic contract. | 39 | 852 |
 | [schemas/tender-record-v1.schema.json](https://github.com/komaroffsergei/tender-lens/blob/main/schemas/tender-record-v1.schema.json) | contract/example | Checked-in JSON Schema, генерируемая из Pydantic contract. | 195 | 3789 |
-| [scripts/check_docs.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/check_docs.py) | automation | Validate generated docs, exact GitHub line links, and built search content. | 80 | 2685 |
+| [scripts/check_docs.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/check_docs.py) | automation | Validate generated docs, exact GitHub line links, and built search content. | 107 | 3391 |
 | [scripts/demo_fake.sh](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/demo_fake.sh) | automation | Служебный automation script для demo, schema, docs или live smoke. | 73 | 2599 |
 | [scripts/export_schemas.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/export_schemas.py) | automation | Экспортирует JSON Schema из Pydantic-контрактов без ручного дублирования. | 68 | 2116 |
 | [scripts/generate_code_reference.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/generate_code_reference.py) | automation | Generate searchable repository, symbol, frontend, and test reference pages. | 637 | 29061 |
