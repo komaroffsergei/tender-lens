@@ -2,6 +2,10 @@
 
 UI — статический progressive enhancement слой без framework, bundler, CDN и внешних runtime-зависимостей. FastAPI отдаёт три packaged files.
 
+Все рабочие состояния интерфейса на desktop и mobile собраны в
+[галерее реального стенда](../ui/README.md): там есть Search, Ask с локальной Ollama,
+loading и ошибка валидации.
+
 <dl class="module-contract">
   <dt>Вход</dt><dd>API key и текст пользователя</dd>
   <dt>Выход</dt><dd>Search/Ask request, безопасно созданные DOM nodes</dd>
