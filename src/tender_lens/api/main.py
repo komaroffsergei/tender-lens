@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import logging
+import asyncio
+import contextlib
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -87,7 +89,15 @@ def create_app(
         application.state.search_service = search_service or SearchService(
             actual_ai, settings.min_relevance_score
         )
+        task = None
+        if settings.portfolio_demo:
+            from tender_lens.portfolio import cleanup_loop
+            task = asyncio.create_task(cleanup_loop(actual_sessions))
         yield
+        if task:
+            task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await task
         if owns_ai and isinstance(actual_ai, OllamaAIProvider):
             await actual_ai.aclose()
         if owns_engine and engine is not None:
@@ -136,6 +146,8 @@ def create_app(
             AppError("internal_error", "Внутренняя ошибка сервиса.", 500),
         )
 
+    from tender_lens.portfolio import install_demo
+    install_demo(application, settings)
     application.include_router(router)
     application.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
 

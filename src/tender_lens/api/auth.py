@@ -39,6 +39,7 @@ async def authenticate_api_key(
     request: Request,
     x_api_key: str | None = Header(default=None, alias="X-API-Key"),
 ) -> ApiKey:
+    x_api_key = getattr(request.state, "portfolio_key", None) or x_api_key
     if not x_api_key:
         raise AppError("api_key_required", "Требуется заголовок X-API-Key.", 401)
     key_hash = hash_api_key(x_api_key)

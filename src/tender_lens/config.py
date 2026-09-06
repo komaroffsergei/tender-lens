@@ -6,7 +6,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -19,6 +19,9 @@ class Settings(BaseSettings):
         case_sensitive=False,
         extra="ignore",
     )
+
+    portfolio_demo: bool = False
+    portfolio_secret: str = ""
 
     app_env: Literal["local", "test", "production"] = "local"
     log_level: str = "INFO"
@@ -68,6 +71,12 @@ class Settings(BaseSettings):
     nats_consumer_name: str = "INDEXER"
     nats_ack_wait_seconds: float = Field(default=300.0, gt=0)
     nats_max_deliver: int = Field(default=5, ge=1, le=100)
+
+    @model_validator(mode="after")
+    def protect_public_demo(self):
+        if self.portfolio_demo and (self.ai_mode != "fake" or len(self.portfolio_secret) < 32):
+            raise ValueError("Public demo requires fake AI and a session signing secret")
+        return self
 
     @field_validator("ollama_url", "ted_base_url", "contracts_finder_base_url")
     @classmethod

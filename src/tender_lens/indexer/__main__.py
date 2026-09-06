@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import logging
+from pathlib import Path
 
 from pydantic import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
@@ -32,6 +33,7 @@ async def run() -> None:
     sessions = create_session_factory(engine)
     broker = NatsBroker(settings)
     await broker.connect()
+    Path("/tmp/indexer-ready").touch()
     ai = (
         FakeAIProvider(settings.embedding_dimensions)
         if settings.ai_mode == "fake"
@@ -77,6 +79,7 @@ async def run() -> None:
                 )
                 await message.term()
     finally:
+        Path("/tmp/indexer-ready").unlink(missing_ok=True)
         if isinstance(ai, OllamaAIProvider):
             await ai.aclose()
         await broker.close()

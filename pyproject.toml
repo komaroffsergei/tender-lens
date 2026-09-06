@@ -46,7 +46,7 @@ include-package-data = true
 where = ["src"]
 
 [tool.setuptools.package-data]
-tender_lens = ["web/*.html", "web/*.css", "web/*.js"]
+tender_lens = ["web/*.html", "web/*.css", "web/*.js", "web/demo/*.html"]
 
 [tool.black]
 line-length = 100

@@ -38,7 +38,7 @@ function createResult(item) {
   badge.textContent = item.source;
   const score = document.createElement("span");
   score.className = "score";
-  score.textContent = `${Math.round(Number(item.score) * 100)}% релевантности`;
+  score.textContent = `cosine: ${Number(item.score).toFixed(3)} · mock embeddings`;
   top.append(badge, score);
 
   const title = document.createElement("h3");

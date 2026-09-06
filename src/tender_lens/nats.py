@@ -72,6 +72,9 @@ class NatsBroker:
                         name=self._settings.nats_stream_name,
                         subjects=[self._settings.nats_subject],
                         storage=StorageType.FILE,
+                        max_bytes=8 * 1024 * 1024,
+                        max_msgs=1000,
+                        max_age=3600,
                     )
                 )
         except DependencyUnavailableError:

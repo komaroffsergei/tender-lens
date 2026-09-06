@@ -7,34 +7,30 @@
   <title>TenderLens</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%234f46e5'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-size='28' font-family='Arial' font-weight='700' fill='white'%3ETL%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="/static/styles.css">
-  <script src="/static/app.js" defer></script>
+  <script src="/static/app.js" defer></script><script src="/static/demo.js" defer></script>
 </head>
 <body>
   <header class="topbar">
     <a class="brand" href="/" aria-label="TenderLens, главная">
       <span class="brand-mark" aria-hidden="true">TL</span>
-      <span><strong>TenderLens</strong><small>TED + Contracts Finder</small></span>
+      <span><strong>TenderLens</strong><small>Синтетический корпус</small></span>
     </a>
     <span id="health" class="status-pill" aria-live="polite">Проверяем API…</span>
   </header>
 
   <main class="layout">
     <section class="hero">
-      <p class="eyebrow">Открытые закупки · pgvector · локальный Ollama</p>
-      <h1>Поиск по смыслу, а не по удачному совпадению букв</h1>
-      <p>Система асинхронно собирает закупки, индексирует метаданные и документы, затем возвращает релевантные фрагменты и проверяемую выжимку.</p>
+      <p class="eyebrow">Демонстрация · pgvector · NATS JetStream</p>
+      <h1>Найти документ. Проверить источник.</h1>
+      <p>Четыре учебных документа проходят настоящие извлечение, разбиение на чанки и индексацию. Внешний сбор отключён. В рабочей версии источниками служат TED и Contracts Finder.</p>
     </section>
 
     <section class="workspace" aria-labelledby="workspace-title">
       <div class="search-panel">
         <h2 id="workspace-title" class="sr-only">Запрос к базе закупок</h2>
-        <label for="api-key">API-ключ</label>
-        <div class="inline-control">
-          <input id="api-key" type="password" autocomplete="off" placeholder="tl_…">
-          <button id="save-key" class="button ghost" type="button">Сохранить в сессии</button>
-        </div>
-        <small>Ключ хранится только в sessionStorage текущей вкладки.</small>
-
+        <input id="api-key" type="hidden" value="portfolio-session"><button id="save-key" hidden></button>
+        <div class="demo-notice"><strong>Демонстрационный режим: используются моки</strong><p>Embeddings заменены детерминированным хешированием токенов, LLM — шаблонным ответом из найденных фрагментов. NATS, извлечение текста, PostgreSQL и cosine search работают реально. Показатель cosine не является оценкой качества модели.</p></div>
+        <div class="demo-examples"><button type="button" data-query="серверы гарантия 36 месяцев">Серверы и гарантия</button><button type="button" data-query="Angular TypeScript формы">Angular-портал</button><button type="button" data-query="ананасы космонавты балет">Нет контекста</button><button type="button" id="demo-reset">Сбросить мой пример</button></div>
         <label class="query-label" for="query">Запрос</label>
         <textarea id="query" rows="5" maxlength="1000" placeholder="Например: поставка серверов и системы хранения с гарантией 36 месяцев"></textarea>
 
@@ -52,7 +48,7 @@
         <ol>
           <li>Запрос превращается в embedding.</li>
           <li>PostgreSQL находит ближайшие чанки.</li>
-          <li>В режиме ответа Ollama видит только найденный контекст.</li>
+          <li>В режиме ответа мок использует только найденные фрагменты.</li>
         </ol>
         <div class="limit-card">
           <strong>Общий лимит Search + Ask</strong>
@@ -61,6 +57,7 @@
       </aside>
     </section>
 
+    <section class="demo-index"><h2>Индексация учебного корпуса</h2><p>Общий корпус доступен только для чтения. Повтор события проверяет очередь и идемпотентность worker, не меняя документы.</p><button id="replay" type="button">Повторить события индексации</button><button id="refresh-index" type="button">Обновить состояние</button><pre id="index-state">Загрузка состояния…</pre><output id="replay-state" aria-live="polite"></output></section>
     <section id="notice" class="notice" role="status" aria-live="polite" hidden></section>
 
     <section id="answer-card" class="answer-card" hidden>
