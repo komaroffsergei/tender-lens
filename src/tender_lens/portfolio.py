@@ -1,6 +1,7 @@
 """Public demo boundary: synthetic corpus, signed expiring sessions, bounded queue replay."""
 from __future__ import annotations
-import asyncio,contextlib,hashlib,hmac,secrets,time
+import asyncio,contextlib,hashlib,hmac,secrets
+from time import time
 from datetime import UTC,datetime,timedelta
 from pathlib import Path
 from uuid import uuid4
