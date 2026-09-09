@@ -12,8 +12,10 @@
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/.gitignore" title="Исключает secrets, caches, local data, build output и IDE state.">.gitignore</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/CHANGELOG.md" title="Хронология пользовательски значимых изменений release.">CHANGELOG.md</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/Dockerfile" title="Один non-root Python image для API, crawler, indexer и migrations.">Dockerfile</a>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/Dockerfile.portfolio" title="Project artifact типа `.portfolio`.">Dockerfile.portfolio</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/LICENSE" title="MIT license, обязательная часть публичной поставки.">LICENSE</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/Makefile" title="Короткие команды install, quality, tests, migrations и demos.">Makefile</a>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/PORTFOLIO-DEMO.md" title="Project artifact типа `.md`.">PORTFOLIO-DEMO.md</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/README.md" title="Краткая публичная входная страница repository.">README.md</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/SECURITY.md" title="Security policy, threat boundaries и disclosure instructions.">SECURITY.md</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/alembic.ini" title="Конфигурация Alembic CLI и logging migration environment.">alembic.ini</a>
@@ -180,6 +182,7 @@
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/logging.py" title="Минимальное структурированное логирование без секретов.">logging.py</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/models.py" title="Пять SQLAlchemy-моделей, утверждённых спецификацией MVP.">models.py</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/nats.py" title="Узкая интеграция NATS JetStream для одного события индексации.">nats.py</a>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/portfolio.py" title="Public demo boundary: synthetic corpus, signed expiring sessions, bounded queue replay.">portfolio.py</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/schemas.py" title="Pydantic-контракты источников, NATS и HTTP API.">schemas.py</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/search.py" title="Exact cosine retrieval и grounded RAG поверх PostgreSQL/pgvector.">search.py</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/storage.py" title="Безопасная потоковая загрузка вложений в локальный volume.">storage.py</a>
@@ -208,8 +211,15 @@
 </details>
 <details><summary>web/</summary>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/app.js" title="Browser state, безопасный DOM rendering и Search/Ask fetch flow.">app.js</a>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/demo.js" title="Project artifact типа `.js`.">demo.js</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html" title="Семантическая разметка статического TenderLens UI.">index.html</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/styles.css" title="Design tokens, desktop/mobile layout и UI component styles.">styles.css</a>
+<details><summary>demo/</summary>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/demo/backup.html" title="Project artifact типа `.html`.">backup.html</a>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/demo/network.html" title="Project artifact типа `.html`.">network.html</a>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/demo/portal.html" title="Project artifact типа `.html`.">portal.html</a>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/demo/servers.html" title="Project artifact типа `.html`.">servers.html</a>
+</details>
 </details>
 </details>
 </details>
@@ -234,6 +244,7 @@
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_extraction_and_chunking.py" title="Unit tests изолированной логики без real infrastructure.">test_extraction_and_chunking.py</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_http_and_storage.py" title="Unit tests изолированной логики без real infrastructure.">test_http_and_storage.py</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_nats_message.py" title="Unit tests изолированной логики без real infrastructure.">test_nats_message.py</a>
+<a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_portfolio_guard.py" title="Unit tests изолированной логики без real infrastructure.">test_portfolio_guard.py</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_project_contract.py" title="Unit tests изолированной логики без real infrastructure.">test_project_contract.py</a>
 <a class="file" href="https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_schemas_and_hashing.py" title="Unit tests изолированной логики без real infrastructure.">test_schemas_and_hashing.py</a>
 </details>
@@ -245,20 +256,21 @@
 | Файл | Слой | Назначение | Строк | Байт |
 |---|---|---|---:|---:|
 | [.dockerignore](https://github.com/komaroffsergei/tender-lens/blob/main/.dockerignore) | project | Исключает local/secret/build artifacts из Docker build context. | 9 | 101 |
-| [.env.example](https://github.com/komaroffsergei/tender-lens/blob/main/.env.example) | project | Безопасный шаблон всех environment settings для Compose. | 30 | 831 |
+| [.env.example](https://github.com/komaroffsergei/tender-lens/blob/main/.env.example) | project | Безопасный шаблон всех environment settings для Compose. | 39 | 1074 |
 | [.flake8](https://github.com/komaroffsergei/tender-lens/blob/main/.flake8) | project | Настраивает Flake8 и согласует длину строки с Black. | 6 | 161 |
 | [.github/PULL_REQUEST_TEMPLATE.md](https://github.com/komaroffsergei/tender-lens/blob/main/.github/PULL_REQUEST_TEMPLATE.md) | automation | Checklist содержательного PR, тестов, безопасности и документации. | 42 | 621 |
 | [.github/workflows/ci.yml](https://github.com/komaroffsergei/tender-lens/blob/main/.github/workflows/ci.yml) | automation | GitHub Actions workflow для автоматической проверки или deployment. | 107 | 3810 |
 | [.github/workflows/docs.yml](https://github.com/komaroffsergei/tender-lens/blob/main/.github/workflows/docs.yml) | automation | GitHub Actions workflow для автоматической проверки или deployment. | 58 | 1658 |
 | [.gitignore](https://github.com/komaroffsergei/tender-lens/blob/main/.gitignore) | project | Исключает secrets, caches, local data, build output и IDE state. | 37 | 383 |
 | [alembic.ini](https://github.com/komaroffsergei/tender-lens/blob/main/alembic.ini) | project | Конфигурация Alembic CLI и logging migration environment. | 31 | 624 |
-| [CHANGELOG.md](https://github.com/komaroffsergei/tender-lens/blob/main/CHANGELOG.md) | project | Хронология пользовательски значимых изменений release. | 32 | 1728 |
+| [CHANGELOG.md](https://github.com/komaroffsergei/tender-lens/blob/main/CHANGELOG.md) | project | Хронология пользовательски значимых изменений release. | 34 | 1963 |
 | [docker-compose.test.yml](https://github.com/komaroffsergei/tender-lens/blob/main/docker-compose.test.yml) | project | Изолированные PostgreSQL/pgvector и NATS для integration/E2E. | 25 | 650 |
 | [docker-compose.yml](https://github.com/komaroffsergei/tender-lens/blob/main/docker-compose.yml) | project | Runtime topology: БД, broker, roles и optional Ollama profile. | 120 | 2786 |
 | [Dockerfile](https://github.com/komaroffsergei/tender-lens/blob/main/Dockerfile) | project | Один non-root Python image для API, crawler, indexer и migrations. | 25 | 681 |
+| [Dockerfile.portfolio](https://github.com/komaroffsergei/tender-lens/blob/main/Dockerfile.portfolio) | project | Project artifact типа `.portfolio`. | 25 | 714 |
 | [docs/algorithm.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/algorithm.md) | documentation | Статья документации: Алгоритмы TenderLens. | 167 | 7260 |
 | [docs/api-examples.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/api-examples.md) | documentation | Статья документации: API TenderLens. | 124 | 2584 |
-| [docs/architecture.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/architecture.md) | documentation | Статья документации: Обзор архитектуры. | 99 | 6892 |
+| [docs/architecture.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/architecture.md) | documentation | Статья документации: Обзор архитектуры. | 100 | 7068 |
 | [docs/architecture/data-and-contracts.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/architecture/data-and-contracts.md) | documentation | Статья документации: Данные и контракты. | 163 | 7220 |
 | [docs/architecture/runtime-flows.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/architecture/runtime-flows.md) | documentation | Статья документации: Потоки данных. | 151 | 6804 |
 | [docs/architecture/security-and-resilience.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/architecture/security-and-resilience.md) | documentation | Статья документации: Безопасность и отказоустойчивость. | 87 | 6258 |
@@ -270,7 +282,7 @@
 | [docs/contributing-docs.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/contributing-docs.md) | documentation | Статья документации: Поддержка документации. | 70 | 3824 |
 | [docs/decisions.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/decisions.md) | documentation | Статья документации: Ключевые решения. | 37 | 1690 |
 | [docs/diagrams/architecture.dot](https://github.com/komaroffsergei/tender-lens/blob/main/docs/diagrams/architecture.dot) | documentation | Редактируемый исходник архитектурной диаграммы. | 35 | 1997 |
-| [docs/diagrams/architecture.mmd](https://github.com/komaroffsergei/tender-lens/blob/main/docs/diagrams/architecture.mmd) | documentation | Редактируемый исходник архитектурной диаграммы. | 21 | 818 |
+| [docs/diagrams/architecture.mmd](https://github.com/komaroffsergei/tender-lens/blob/main/docs/diagrams/architecture.mmd) | documentation | Редактируемый исходник архитектурной диаграммы. | 21 | 829 |
 | [docs/diagrams/architecture.png](https://github.com/komaroffsergei/tender-lens/blob/main/docs/diagrams/architecture.png) | documentation | Отрендеренная архитектурная иллюстрация для Markdown/README. | — | 158080 |
 | [docs/diagrams/ask-sequence.mmd](https://github.com/komaroffsergei/tender-lens/blob/main/docs/diagrams/ask-sequence.mmd) | documentation | Редактируемый исходник архитектурной диаграммы. | 25 | 786 |
 | [docs/diagrams/crawl-sequence.mmd](https://github.com/komaroffsergei/tender-lens/blob/main/docs/diagrams/crawl-sequence.mmd) | documentation | Редактируемый исходник архитектурной диаграммы. | 27 | 906 |
@@ -284,13 +296,13 @@
 | [docs/glossary.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/glossary.md) | documentation | Статья документации: Глоссарий. | 276 | 19491 |
 | [docs/index.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/index.md) | documentation | Статья документации: Как устроен TenderLens. | 72 | 5899 |
 | [docs/javascripts/docs.js](https://github.com/komaroffsergei/tender-lens/blob/main/docs/javascripts/docs.js) | documentation | Добавляет Ctrl+K и управление раскрытием code tree. | 21 | 816 |
-| [docs/modules/api-and-rag.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/api-and-rag.md) | documentation | Статья документации: Search, RAG и API. | 83 | 6265 |
+| [docs/modules/api-and-rag.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/api-and-rag.md) | documentation | Статья документации: Search, RAG и API. | 84 | 6529 |
 | [docs/modules/core.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/core.md) | documentation | Статья документации: Конфигурация и домен. | 68 | 6352 |
 | [docs/modules/crawler.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/crawler.md) | documentation | Статья документации: Crawler. | 76 | 7309 |
-| [docs/modules/indexer.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/indexer.md) | documentation | Статья документации: Indexer. | 72 | 5372 |
+| [docs/modules/indexer.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/indexer.md) | documentation | Статья документации: Indexer. | 72 | 5382 |
 | [docs/modules/infrastructure.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/infrastructure.md) | documentation | Статья документации: Инфраструктура. | 79 | 4443 |
 | [docs/modules/web-ui.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/modules/web-ui.md) | documentation | Статья документации: Web UI. | 76 | 4276 |
-| [docs/operations.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/operations.md) | documentation | Статья документации: Запуск и реальная LLM. | 250 | 11029 |
+| [docs/operations.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/operations.md) | documentation | Статья документации: Запуск и реальная LLM. | 267 | 12305 |
 | [docs/operations/troubleshooting.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/operations/troubleshooting.md) | documentation | Статья документации: Диагностика. | 154 | 8162 |
 | [docs/overrides/partials/source.html](https://github.com/komaroffsergei/tender-lens/blob/main/docs/overrides/partials/source.html) | documentation | Рисует GitHub link без фонового GitHub API запроса. | 12 | 405 |
 | [docs/progress.md](https://github.com/komaroffsergei/tender-lens/blob/main/docs/progress.md) | documentation | Статья документации: Состояние проекта. | 29 | 1610 |
@@ -341,8 +353,9 @@
 | [migrations/script.py.mako](https://github.com/komaroffsergei/tender-lens/blob/main/migrations/script.py.mako) | database | Шаблон новых Alembic revision files. | 24 | 593 |
 | [migrations/versions/0001_initial_schema.py](https://github.com/komaroffsergei/tender-lens/blob/main/migrations/versions/0001_initial_schema.py) | database | Создание минимальной схемы TenderLens. | 197 | 8482 |
 | [mkdocs.yml](https://github.com/komaroffsergei/tender-lens/blob/main/mkdocs.yml) | project | Структура, тема, поиск, extensions и navigation документационного сайта. | 134 | 4372 |
-| [pyproject.toml](https://github.com/komaroffsergei/tender-lens/blob/main/pyproject.toml) | project | Package metadata, entrypoint и конфигурация Black/Pytest/MyPy. | 78 | 1946 |
-| [README.md](https://github.com/komaroffsergei/tender-lens/blob/main/README.md) | project | Краткая публичная входная страница repository. | 227 | 9990 |
+| [PORTFOLIO-DEMO.md](https://github.com/komaroffsergei/tender-lens/blob/main/PORTFOLIO-DEMO.md) | project | Project artifact типа `.md`. | 19 | 3597 |
+| [pyproject.toml](https://github.com/komaroffsergei/tender-lens/blob/main/pyproject.toml) | project | Package metadata, entrypoint и конфигурация Black/Pytest/MyPy. | 78 | 1965 |
+| [README.md](https://github.com/komaroffsergei/tender-lens/blob/main/README.md) | project | Краткая публичная входная страница repository. | 244 | 10802 |
 | [requirements-dev.lock](https://github.com/komaroffsergei/tender-lens/blob/main/requirements-dev.lock) | project | Pinned quality, typing и test dependencies. | 7 | 117 |
 | [requirements-docs.lock](https://github.com/komaroffsergei/tender-lens/blob/main/requirements-docs.lock) | project | Pinned generator/theme stack документации. | 1 | 23 |
 | [requirements.lock](https://github.com/komaroffsergei/tender-lens/blob/main/requirements.lock) | project | Pinned runtime dependencies Docker image. | 12 | 214 |
@@ -351,18 +364,18 @@
 | [scripts/check_docs.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/check_docs.py) | automation | Validate generated docs, exact GitHub line links, and built search content. | 145 | 4922 |
 | [scripts/demo_fake.sh](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/demo_fake.sh) | automation | Служебный automation script для demo, schema, docs или live smoke. | 73 | 2599 |
 | [scripts/export_schemas.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/export_schemas.py) | automation | Экспортирует JSON Schema из Pydantic-контрактов без ручного дублирования. | 68 | 2116 |
-| [scripts/generate_code_reference.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/generate_code_reference.py) | automation | Generate searchable repository, symbol, frontend, and test reference pages. | 645 | 30300 |
+| [scripts/generate_code_reference.py](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/generate_code_reference.py) | automation | Generate searchable repository, symbol, frontend, and test reference pages. | 646 | 30397 |
 | [scripts/live_smoke.sh](https://github.com/komaroffsergei/tender-lens/blob/main/scripts/live_smoke.sh) | automation | Служебный automation script для demo, schema, docs или live smoke. | 13 | 440 |
 | [SECURITY.md](https://github.com/komaroffsergei/tender-lens/blob/main/SECURITY.md) | project | Security policy, threat boundaries и disclosure instructions. | 17 | 795 |
 | [src/tender_lens/__init__.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/__init__.py) | application | TenderLens: мониторинг закупок и локальный RAG. | 3 | 104 |
-| [src/tender_lens/ai.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/ai.py) | application | Минимальные providers для embeddings и grounded generation. | 165 | 6725 |
+| [src/tender_lens/ai.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/ai.py) | application | Минимальные providers для embeddings и grounded generation. | 280 | 11800 |
 | [src/tender_lens/api/__init__.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/api/__init__.py) | application | FastAPI Gateway TenderLens. | 1 | 34 |
-| [src/tender_lens/api/auth.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/api/auth.py) | application | Проверка X-API-Key без сохранения открытого секрета. | 59 | 2018 |
-| [src/tender_lens/api/main.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/api/main.py) | application | App factory, lifecycle, middleware, errors и статический интерфейс. | 149 | 5498 |
+| [src/tender_lens/api/auth.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/api/auth.py) | application | Проверка X-API-Key без сохранения открытого секрета. | 60 | 2093 |
+| [src/tender_lens/api/main.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/api/main.py) | application | App factory, lifecycle, middleware, errors и статический интерфейс. | 173 | 6608 |
 | [src/tender_lens/api/rate_limit.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/api/rate_limit.py) | application | Fixed UTC-minute limiter в одной атомарной PostgreSQL-транзакции. | 86 | 2826 |
 | [src/tender_lens/api/routes.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/api/routes.py) | application | Тонкие HTTP routes: валидация, зависимости и вызов сервисов. | 116 | 3844 |
 | [src/tender_lens/cli.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/cli.py) | application | Служебные команды: API-ключи, demo seed и проверка зависимостей. | 260 | 9304 |
-| [src/tender_lens/config.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/config.py) | application | Типизированная конфигурация приложения без побочных эффектов. | 94 | 3871 |
+| [src/tender_lens/config.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/config.py) | application | Типизированная конфигурация приложения без побочных эффектов. | 128 | 5472 |
 | [src/tender_lens/crawler/__init__.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/crawler/__init__.py) | application | Асинхронный сбор и нормализация открытых закупок. | 1 | 99 |
 | [src/tender_lens/crawler/__main__.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/crawler/__main__.py) | application | CLI entrypoint роли crawler. | 154 | 5917 |
 | [src/tender_lens/crawler/base.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/crawler/base.py) | application | Общий контракт источника и безопасная HTTP-политика crawler. | 281 | 11843 |
@@ -374,19 +387,25 @@
 | [src/tender_lens/errors.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/errors.py) | application | Типизированные ошибки, переводимые в стабильные HTTP-ответы и логи. | 44 | 1410 |
 | [src/tender_lens/hashing.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/hashing.py) | application | Детерминированные hash-функции для закупок, файлов и чанков. | 87 | 2578 |
 | [src/tender_lens/indexer/__init__.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/indexer/__init__.py) | application | Фоновая индексация закупок и вложений. | 1 | 78 |
-| [src/tender_lens/indexer/__main__.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/indexer/__main__.py) | application | CLI entrypoint durable INDEXER consumer. | 92 | 3433 |
+| [src/tender_lens/indexer/__main__.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/indexer/__main__.py) | application | CLI entrypoint durable INDEXER consumer. | 106 | 4160 |
 | [src/tender_lens/indexer/chunk.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/indexer/chunk.py) | application | Детерминированный paragraph-first chunking без отдельного фреймворка. | 81 | 2694 |
 | [src/tender_lens/indexer/extract.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/indexer/extract.py) | application | Безопасное извлечение текста из ограниченного набора форматов. | 162 | 6406 |
-| [src/tender_lens/indexer/service.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/indexer/service.py) | application | Идемпотентная обработка tender.changed.v1 и атомарная замена чанков. | 162 | 6899 |
+| [src/tender_lens/indexer/service.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/indexer/service.py) | application | Идемпотентная обработка tender.changed.v1 и атомарная замена чанков. | 162 | 6913 |
 | [src/tender_lens/logging.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/logging.py) | application | Минимальное структурированное логирование без секретов. | 50 | 1698 |
 | [src/tender_lens/models.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/models.py) | application | Пять SQLAlchemy-моделей, утверждённых спецификацией MVP. | 211 | 9194 |
-| [src/tender_lens/nats.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/nats.py) | application | Узкая интеграция NATS JetStream для одного события индексации. | 162 | 6098 |
+| [src/tender_lens/nats.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/nats.py) | application | Узкая интеграция NATS JetStream для одного события индексации. | 165 | 6226 |
+| [src/tender_lens/portfolio.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/portfolio.py) | application | Public demo boundary: synthetic corpus, signed expiring sessions, bounded queue replay. | 303 | 12643 |
 | [src/tender_lens/schemas.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/schemas.py) | application | Pydantic-контракты источников, NATS и HTTP API. | 200 | 5927 |
 | [src/tender_lens/search.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/search.py) | application | Exact cosine retrieval и grounded RAG поверх PostgreSQL/pgvector. | 112 | 4190 |
 | [src/tender_lens/storage.py](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/storage.py) | application | Безопасная потоковая загрузка вложений в локальный volume. | 99 | 3328 |
-| [src/tender_lens/web/app.js](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/app.js) | application | Browser state, безопасный DOM rendering и Search/Ask fetch flow. | 172 | 6511 |
-| [src/tender_lens/web/index.html](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html) | application | Семантическая разметка статического TenderLens UI. | 90 | 4828 |
-| [src/tender_lens/web/styles.css](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/styles.css) | application | Design tokens, desktop/mobile layout и UI component styles. | 79 | 6953 |
+| [src/tender_lens/web/app.js](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/app.js) | application | Browser state, безопасный DOM rendering и Search/Ask fetch flow. | 172 | 6494 |
+| [src/tender_lens/web/demo.js](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/demo.js) | application | Project artifact типа `.js`. | 6 | 1152 |
+| [src/tender_lens/web/demo/backup.html](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/demo/backup.html) | application | Project artifact типа `.html`. | 1 | 1490 |
+| [src/tender_lens/web/demo/network.html](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/demo/network.html) | application | Project artifact типа `.html`. | 1 | 1404 |
+| [src/tender_lens/web/demo/portal.html](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/demo/portal.html) | application | Project artifact типа `.html`. | 1 | 1404 |
+| [src/tender_lens/web/demo/servers.html](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/demo/servers.html) | application | Project artifact типа `.html`. | 1 | 1441 |
+| [src/tender_lens/web/index.html](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html) | application | Семантическая разметка статического TenderLens UI. | 87 | 6171 |
+| [src/tender_lens/web/styles.css](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/styles.css) | application | Design tokens, desktop/mobile layout и UI component styles. | 81 | 7693 |
 | [tests/api/test_api.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/api/test_api.py) | test | In-process FastAPI contract tests с dependency injection. | 353 | 11273 |
 | [tests/conftest.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/conftest.py) | test | Общие pytest fixtures project root и example fixture directory. | 15 | 316 |
 | [tests/e2e/test_fixture_pipeline.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/e2e/test_fixture_pipeline.py) | test | Полный fixture pipeline от crawler до Search/Ask. | 265 | 8882 |
@@ -394,13 +413,14 @@
 | [tests/integration/test_database_pipeline.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/integration/test_database_pipeline.py) | test | Integration tests с настоящими PostgreSQL/pgvector или NATS. | 437 | 14868 |
 | [tests/integration/test_nats.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/integration/test_nats.py) | test | Integration tests с настоящими PostgreSQL/pgvector или NATS. | 45 | 1586 |
 | [tests/unit/test_adapters.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_adapters.py) | test | Unit tests изолированной логики без real infrastructure. | 307 | 10501 |
-| [tests/unit/test_ai_and_search.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_ai_and_search.py) | test | Unit tests изолированной логики без real infrastructure. | 119 | 4029 |
+| [tests/unit/test_ai_and_search.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_ai_and_search.py) | test | Unit tests изолированной логики без real infrastructure. | 233 | 7885 |
 | [tests/unit/test_auth_and_rate_limit.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_auth_and_rate_limit.py) | test | Unit tests изолированной логики без real infrastructure. | 86 | 2895 |
 | [tests/unit/test_cli.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_cli.py) | test | Unit tests изолированной логики без real infrastructure. | 20 | 556 |
 | [tests/unit/test_extraction_and_chunking.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_extraction_and_chunking.py) | test | Unit tests изолированной логики без real infrastructure. | 135 | 4605 |
 | [tests/unit/test_http_and_storage.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_http_and_storage.py) | test | Unit tests изолированной логики без real infrastructure. | 308 | 9962 |
 | [tests/unit/test_nats_message.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_nats_message.py) | test | Unit tests изолированной логики без real infrastructure. | 33 | 789 |
-| [tests/unit/test_project_contract.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_project_contract.py) | test | Unit tests изолированной логики без real infrastructure. | 141 | 4532 |
+| [tests/unit/test_portfolio_guard.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_portfolio_guard.py) | test | Unit tests изолированной логики без real infrastructure. | 47 | 1572 |
+| [tests/unit/test_project_contract.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_project_contract.py) | test | Unit tests изолированной логики без real infrastructure. | 144 | 4666 |
 | [tests/unit/test_schemas_and_hashing.py](https://github.com/komaroffsergei/tender-lens/blob/main/tests/unit/test_schemas_and_hashing.py) | test | Unit tests изолированной логики без real infrastructure. | 133 | 5000 |
 
 _Сгенерировано из `git ls-files` и локального source tree. Binary assets показывают «—» вместо числа строк._

@@ -18,7 +18,7 @@ API — тонкая HTTP-оболочка над authentication, rate limiting 
 | [`api/auth.py`](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/api/auth.py) | API-key generation/hash/lookup |
 | [`api/rate_limit.py`](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/api/rate_limit.py) | atomic fixed UTC-minute counter |
 | [`search.py`](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/search.py) | pgvector retrieval и grounded ask |
-| [`ai.py`](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/ai.py) | provider protocol, fake/Ollama, prompt |
+| [`ai.py`](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/ai.py) | provider protocol, fake/Ollama/MWS, prompt |
 
 ## App factory и lifespan
 
@@ -57,12 +57,13 @@ Query превращается в embedding, далее PostgreSQL вычисл�
 
 MVP использует exact scan: просто и детерминированно для небольшого индекса. При большом числе chunks потребуются HNSW/IVFFlat и измеренный recall/latency trade-off.
 
-## Fake и live provider
+## AI providers
 
 [`AIProvider`](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/ai.py#L17-L23) задаёт `embed`, `generate`, `health`.
 
 - `FakeAIProvider` — hashing trick: token получает детерминированный индекс и знак по SHA-256, vector нормализуется. Это не нейросеть и не production semantic model; он делает CI быстрым и повторяемым.
 - `OllamaAIProvider` вызывает `/api/embed`, `/api/generate`, `/api/tags`, строго проверяет количество и размерность vectors и переводит HTTP/JSON ошибки в typed dependency error.
+- `MwsAIProvider` вызывает OpenAI-совместимые `/embeddings`, `/chat/completions`, `/models`, передаёт Bearer key только в заголовке и проверяет количество, порядок и размерность vectors.
 
 ## Grounded Ask
 

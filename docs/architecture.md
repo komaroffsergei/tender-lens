@@ -10,7 +10,7 @@ flowchart TB
     CLIENT["API-клиент"] --> API["FastAPI"]
     UI --> API
     API --> PG[("PostgreSQL + pgvector")]
-    API --> OLLAMA["Ollama"]
+    API --> AI["AI provider: Ollama / MWS"]
     TED["TED"] --> CRAWLER["Crawler"]
     CF["Contracts Finder"] --> CRAWLER
     CRAWLER --> PG
@@ -18,7 +18,7 @@ flowchart TB
     CRAWLER --> NATS["NATS JetStream"]
     NATS --> INDEXER["Indexer"]
     INDEXER --> FILES
-    INDEXER --> OLLAMA
+    INDEXER --> AI
     INDEXER --> PG
 ```
 
@@ -62,7 +62,7 @@ infrastructure  nats.py             · storage.py           · logging.py
 presentation    api/routes.py       · web/
 ```
 
-Зависимости направлены преимущественно сверху вниз. Доменные схемы не открывают соединения, импорт модулей не должен требовать PostgreSQL/NATS/Ollama, а connection lifecycle создаётся в entrypoint или FastAPI lifespan.
+Зависимости направлены преимущественно сверху вниз. Доменные схемы не открывают соединения, импорт модулей не должен требовать PostgreSQL/NATS/AI endpoint, а connection lifecycle создаётся в entrypoint или FastAPI lifespan.
 
 ## Синхронные и асинхронные границы
 
@@ -93,6 +93,7 @@ presentation    api/routes.py       · web/
 - [pgvector](https://github.com/pgvector/pgvector) — тип `VECTOR` и cosine distance operator.
 - [NATS JetStream](https://docs.nats.io/nats-concepts/jetstream) — durable stream и explicit ACK.
 - [Ollama API](https://docs.ollama.com/api/introduction) — локальные embeddings и generation.
+- [MWS Model Hub](https://mws.ru/docs/cloud-platform/gpt/general/inference.html) — OpenAI-совместимые удалённые embeddings и generation.
 - [httpx](https://www.python-httpx.org/async/) — асинхронный HTTP-клиент.
 - [Pydantic](https://docs.pydantic.dev/latest/) — runtime-валидация контрактов.
 

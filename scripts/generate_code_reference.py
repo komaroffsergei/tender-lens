@@ -75,6 +75,7 @@ SYMBOL_DESCRIPTIONS = {
     "SearchService": "Выполняет pgvector retrieval и grounded generation.",
     "FakeAIProvider": "Детерминированный hashing provider для тестов и offline demo.",
     "OllamaAIProvider": "Проверяемый async client Ollama embed/generate/health API.",
+    "MwsAIProvider": "Проверяемый async client OpenAI-compatible MWS Model Hub API.",
     "NatsBroker": "Создаёт JetStream stream, публикует events и читает durable consumer.",
     "NatsMessage": "Изолирует indexer от SDK типов и оставляет ACK/NAK/TERM.",
     "InMemoryBroker": "Запоминает events без внешнего NATS для unit/E2E.",

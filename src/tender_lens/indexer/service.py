@@ -134,14 +134,14 @@ class IndexerService:
                             draft.attachment_id,
                             draft.position,
                             content_hash,
-                            self._settings.embedding_model,
+                            self._settings.active_embedding_model,
                         ),
                         position=draft.position,
                         section=draft.section,
                         content=draft.content,
                         content_hash=content_hash,
                         embedding=vector,
-                        embedding_model=self._settings.embedding_model,
+                        embedding_model=self._settings.active_embedding_model,
                     )
                 )
 

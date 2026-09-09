@@ -5,7 +5,7 @@ Indexer переводит сохранённую закупку и её док�
 <dl class="module-contract">
   <dt>Вход</dt><dd>tender.changed.v1, PostgreSQL rows, attachment files</dd>
   <dt>Выход</dt><dd>chunks + VECTOR(1024), indexed_hash, index_status</dd>
-  <dt>AI</dt><dd>FakeAIProvider в CI или Ollama embeddings в live</dd>
+  <dt>AI</dt><dd>FakeAIProvider в CI, Ollama локально или MWS Model Hub на публичном стенде</dd>
   <dt>Точка запуска</dt><dd><code>python -m tender_lens.indexer</code></dd>
 </dl>
 
@@ -51,7 +51,7 @@ Overlap сохраняет контекст возле границы, но ув
 
 ## AI batches
 
-`EMBEDDING_BATCH_SIZE` ограничивает число текстов в одном `/api/embed`. Это критично для CPU Ollama: один большой вызов избегает overhead отдельного HTTP request на chunk, а небольшие batches ограничивают память и latency.
+`EMBEDDING_BATCH_SIZE` ограничивает число текстов в одном запросе provider. Один batch уменьшает HTTP overhead, а верхняя граница ограничивает latency, память и размер запроса к Ollama/MWS.
 
 Проверяются:
 
@@ -66,7 +66,7 @@ Overlap сохраняет контекст возле границы, но ув
 |---|---|
 | невалидный JSON/Pydantic | `TERM` |
 | `missing/stale/unchanged/ready` | `ACK` |
-| Ollama/PostgreSQL/OSError | `NAK(delay=10)` |
+| Ollama/MWS/PostgreSQL/OSError | `NAK(delay=10)` |
 | неожиданная постоянная ошибка | `TERM` |
 
 JetStream всё равно ограничивает доставку `max_deliver=5`, а `ack_wait=300s` должен быть больше нормальной индексации одного tender.

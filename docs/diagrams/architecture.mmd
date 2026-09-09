@@ -14,8 +14,8 @@ flowchart LR
     NATS -->|durable pull / explicit ACK| INDEXER
     INDEXER -->|read| PG
     INDEXER -->|read| VOL
-    INDEXER -->|batch embeddings| OLLAMA[Ollama]
+    INDEXER -->|batch embeddings| AI[AI provider\nOllama / MWS]
     INDEXER -->|chunks + vectors| PG
     API -->|exact cosine search| PG
-    API -->|embed + generate| OLLAMA
+    API -->|embed + generate| AI
     BROWSER[Static HTML/CSS/JS] -->|HTTP + X-API-Key| API

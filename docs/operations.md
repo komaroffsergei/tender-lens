@@ -8,8 +8,9 @@ Runbook рассчитан на чистую машину с Docker Engine/Compo
 |---|---|---|---|
 | `AI_MODE=fake` | hashing trick | deterministic fragment concat | CI, unit/E2E, быстрая демонстрация |
 | `AI_MODE=live` | `qwen3-embedding:0.6b` | `qwen3:1.7b` | ручная semantic/RAG демонстрация |
+| `AI_MODE=mws` | MWS embedding deployment | MWS chat deployment | публичный стенд без локальной GPU |
 
-Fake provider проверяет pipeline, но не качество естественного языка. Live provider действительно обращается к локальному Ollama.
+Fake provider проверяет pipeline, но не качество естественного языка. Live provider обращается к локальному Ollama, MWS provider — к OpenAI-совместимому API Model Hub.
 
 ## Чистый запуск
 
@@ -44,6 +45,22 @@ docker compose --profile ai logs -f model-init
 ```
 
 `model-init` одноразово скачивает embedding и generation models. Первый запуск требует сеть, место на диске и время. Завершение `model-init` с кодом 0 означает, что обе модели доступны Ollama volume.
+
+## Реальные модели MWS
+
+Создайте два deployment в одном проекте MWS: embedding-модель и chat-модель. В `.env` задайте фактические deployment IDs из `GET /models`:
+
+```dotenv
+AI_MODE=mws
+MWS_PROJECT=tenderlens-demo
+MWS_API_KEY=...
+MWS_EMBEDDING_MODEL=bge-m3
+MWS_GENERATION_MODEL=generaciya-otveta-gpt-oss-120b
+MWS_REASONING_EFFORT=low
+MWS_MAX_COMPLETION_TOKENS=512
+```
+
+API key хранится как secret и не добавляется в Git, Compose-файл или image. Readiness делает `GET /models` и требует присутствия обоих deployment IDs. Indexer использует `/embeddings`, Ask — `/chat/completions`. Публичный режим ограничивает каждый сеанс обычным API limiter и весь процесс — `PORTFOLIO_GLOBAL_RATE_LIMIT_PER_MINUTE`. После смены embedding provider повторно опубликуйте события всех документов, чтобы indexer атомарно заменил старые chunks.
 
 ### Доказательство live-режима
 

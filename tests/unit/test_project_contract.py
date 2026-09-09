@@ -54,6 +54,9 @@ def test_example_environment_file_is_valid(project_root):
         ("embedding_dimensions", 768),
         ("embedding_batch_size", 0),
         ("ollama_timeout_seconds", 0),
+        ("mws_timeout_seconds", 0),
+        ("mws_max_completion_tokens", 10),
+        ("portfolio_global_rate_limit_per_minute", 0),
         ("min_relevance_score", 2),
     ],
 )

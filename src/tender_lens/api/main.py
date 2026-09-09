@@ -16,7 +16,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from tender_lens.ai import AIProvider, FakeAIProvider, OllamaAIProvider
+from tender_lens.ai import AIProvider, FakeAIProvider, MwsAIProvider, OllamaAIProvider
 from tender_lens.api.routes import router
 from tender_lens.config import Settings, get_settings
 from tender_lens.db import SessionFactory, create_engine, create_session_factory
@@ -72,17 +72,27 @@ def create_app(
             engine = create_engine(settings)
             actual_sessions = create_session_factory(engine)
         if actual_ai is None:
-            actual_ai = (
-                FakeAIProvider(settings.embedding_dimensions)
-                if settings.ai_mode == "fake"
-                else OllamaAIProvider(
+            if settings.ai_mode == "fake":
+                actual_ai = FakeAIProvider(settings.embedding_dimensions)
+            elif settings.ai_mode == "mws":
+                actual_ai = MwsAIProvider(
+                    base_url=settings.mws_openai_base_url,
+                    api_key=settings.mws_api_key.get_secret_value(),
+                    embedding_model=settings.mws_embedding_model,
+                    generation_model=settings.mws_generation_model,
+                    dimensions=settings.embedding_dimensions,
+                    reasoning_effort=settings.mws_reasoning_effort,
+                    max_completion_tokens=settings.mws_max_completion_tokens,
+                    timeout_seconds=settings.mws_timeout_seconds,
+                )
+            else:
+                actual_ai = OllamaAIProvider(
                     base_url=settings.ollama_url,
                     embedding_model=settings.embedding_model,
                     generation_model=settings.generation_model,
                     dimensions=settings.embedding_dimensions,
                     timeout_seconds=settings.ollama_timeout_seconds,
                 )
-            )
         application.state.settings = settings
         application.state.session_factory = actual_sessions
         application.state.ai = actual_ai
@@ -92,13 +102,14 @@ def create_app(
         task = None
         if settings.portfolio_demo:
             from tender_lens.portfolio import cleanup_loop
+
             task = asyncio.create_task(cleanup_loop(actual_sessions))
         yield
         if task:
             task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
                 await task
-        if owns_ai and isinstance(actual_ai, OllamaAIProvider):
+        if owns_ai and isinstance(actual_ai, (MwsAIProvider, OllamaAIProvider)):
             await actual_ai.aclose()
         if owns_engine and engine is not None:
             await engine.dispose()
@@ -147,6 +158,7 @@ def create_app(
         )
 
     from tender_lens.portfolio import install_demo
+
     install_demo(application, settings)
     application.include_router(router)
     application.mount("/static", StaticFiles(directory=WEB_DIR), name="static")

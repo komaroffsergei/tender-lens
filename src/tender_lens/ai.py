@@ -142,6 +142,121 @@ class OllamaAIProvider:
             return False
 
 
+class MwsAIProvider:
+    """OpenAI-compatible MWS Model Hub provider."""
+
+    def __init__(
+        self,
+        *,
+        base_url: str,
+        api_key: str,
+        embedding_model: str,
+        generation_model: str,
+        dimensions: int,
+        reasoning_effort: str = "low",
+        max_completion_tokens: int = 512,
+        timeout_seconds: float = 90.0,
+        client: httpx.AsyncClient | None = None,
+    ) -> None:
+        self._base_url = base_url.rstrip("/")
+        self._headers = {"Authorization": f"Bearer {api_key}"}
+        self._embedding_model = embedding_model
+        self._generation_model = generation_model
+        self._dimensions = dimensions
+        self._reasoning_effort = reasoning_effort
+        self._max_completion_tokens = max_completion_tokens
+        self._owns_client = client is None
+        self._client = client or httpx.AsyncClient(timeout=timeout_seconds)
+
+    async def aclose(self) -> None:
+        if self._owns_client:
+            await self._client.aclose()
+
+    async def embed(self, texts: list[str]) -> list[list[float]]:
+        if not texts:
+            return []
+        try:
+            response = await self._client.post(
+                f"{self._base_url}/embeddings",
+                headers=self._headers,
+                json={"model": self._embedding_model, "input": texts},
+            )
+            response.raise_for_status()
+            payload = response.json()
+        except (httpx.HTTPError, ValueError) as exc:
+            raise DependencyUnavailableError("MWS embeddings endpoint недоступен.") from exc
+
+        data = payload.get("data") if isinstance(payload, dict) else None
+        if not isinstance(data, list) or len(data) != len(texts):
+            raise InvalidAIResponseError("MWS вернул неверное число embeddings.")
+
+        indexed: dict[int, list[float]] = {}
+        for item in data:
+            if not isinstance(item, dict) or not isinstance(item.get("index"), int):
+                raise InvalidAIResponseError("MWS embedding не содержит корректный index.")
+            vector = item.get("embedding")
+            if not isinstance(vector, list) or len(vector) != self._dimensions:
+                raise InvalidAIResponseError("MWS вернул embedding неверной размерности.")
+            try:
+                indexed[item["index"]] = [float(value) for value in vector]
+            except (TypeError, ValueError) as exc:
+                raise InvalidAIResponseError("Embedding содержит нечисловые значения.") from exc
+
+        expected_indexes = set(range(len(texts)))
+        if set(indexed) != expected_indexes:
+            raise InvalidAIResponseError("MWS вернул неверные индексы embeddings.")
+        return [indexed[index] for index in range(len(texts))]
+
+    async def generate(self, *, system: str, prompt: str) -> str:
+        try:
+            response = await self._client.post(
+                f"{self._base_url}/chat/completions",
+                headers=self._headers,
+                json={
+                    "model": self._generation_model,
+                    "messages": [
+                        {"role": "system", "content": system},
+                        {"role": "user", "content": prompt},
+                    ],
+                    "temperature": 0.0,
+                    "reasoning_effort": self._reasoning_effort,
+                    "max_completion_tokens": self._max_completion_tokens,
+                },
+            )
+            response.raise_for_status()
+            payload = response.json()
+        except (httpx.HTTPError, ValueError) as exc:
+            raise DependencyUnavailableError("MWS chat endpoint недоступен.") from exc
+
+        choices = payload.get("choices") if isinstance(payload, dict) else None
+        if not isinstance(choices, list) or not choices or not isinstance(choices[0], dict):
+            raise InvalidAIResponseError("MWS не вернул вариант ответа.")
+        message = choices[0].get("message")
+        text = message.get("content") if isinstance(message, dict) else None
+        if not isinstance(text, str) or not text.strip():
+            raise InvalidAIResponseError("MWS вернул пустой текст.")
+        return text.strip()
+
+    async def health(self) -> bool:
+        try:
+            response = await self._client.get(
+                f"{self._base_url}/models", headers=self._headers, timeout=5.0
+            )
+            response.raise_for_status()
+            payload = response.json()
+        except (httpx.HTTPError, ValueError):
+            return False
+        data = payload.get("data") if isinstance(payload, dict) else None
+        if not isinstance(data, list):
+            return False
+        model_ids = {
+            item.get("id")
+            for item in data
+            if isinstance(item, dict) and isinstance(item.get("id"), str)
+        }
+        return {self._embedding_model, self._generation_model}.issubset(model_ids)
+
+
 def build_rag_prompt(query: str, results: list[SearchResult]) -> tuple[str, str]:
     """Создаёт prompt, где внешние документы явно являются недоверенным контекстом."""
 

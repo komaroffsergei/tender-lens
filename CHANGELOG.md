@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Добавлен MWS Model Hub provider для реальных `bge-m3` embeddings и grounded generation
+  через OpenAI-совместимый API; публичный стенд больше не использует fake AI.
 - Индексация реальной Ollama выполняется ограниченными batch-запросами с отдельным timeout,
   чтобы большие документы не падали на CPU-only окружении.
 - Integration CI запускает NATS на динамическом свободном порту и всегда удаляет свой контейнер.

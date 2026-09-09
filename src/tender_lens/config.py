@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+import re
 from typing import Literal
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -22,6 +23,7 @@ class Settings(BaseSettings):
 
     portfolio_demo: bool = False
     portfolio_secret: str = ""
+    portfolio_global_rate_limit_per_minute: int = Field(default=12, ge=1, le=60)
 
     app_env: Literal["local", "test", "production"] = "local"
     log_level: str = "INFO"
@@ -30,7 +32,7 @@ class Settings(BaseSettings):
     nats_url: str = "nats://localhost:4222"
     ollama_url: str = "http://localhost:11434"
 
-    ai_mode: Literal["live", "fake"] = "fake"
+    ai_mode: Literal["live", "fake", "mws"] = "fake"
     embedding_model: str = "qwen3-embedding:0.6b"
     # Размерность зафиксирована схемой PostgreSQL VECTOR(1024). Тип int нужен,
     # чтобы pydantic-settings мог корректно разобрать строковое значение из .env.
@@ -39,6 +41,14 @@ class Settings(BaseSettings):
     min_relevance_score: float = Field(default=0.20, ge=-1.0, le=1.0)
     embedding_batch_size: int = Field(default=8, ge=1, le=128)
     ollama_timeout_seconds: float = Field(default=300.0, gt=0, le=3600)
+    mws_base_url: str = "https://gpt.mwsapis.ru"
+    mws_project: str = ""
+    mws_api_key: SecretStr = SecretStr("")
+    mws_embedding_model: str = "bge-m3"
+    mws_generation_model: str = "gpt-oss-120b"
+    mws_reasoning_effort: Literal["low", "medium", "high"] = "low"
+    mws_max_completion_tokens: int = Field(default=512, ge=64, le=2048)
+    mws_timeout_seconds: float = Field(default=90.0, gt=0, le=300)
 
     attachments_dir: Path = Path("./data/attachments")
     max_attachment_bytes: int = Field(default=20 * 1024 * 1024, ge=1024)
@@ -74,11 +84,18 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def protect_public_demo(self):
-        if self.portfolio_demo and (self.ai_mode != "fake" or len(self.portfolio_secret) < 32):
-            raise ValueError("Public demo requires fake AI and a session signing secret")
+        if self.portfolio_demo and self.ai_mode not in {"fake", "mws"}:
+            raise ValueError("Public demo supports only fake or MWS AI")
+        if self.portfolio_demo and len(self.portfolio_secret) < 32:
+            raise ValueError("Public demo requires a session signing secret")
+        if self.ai_mode == "mws":
+            if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,62}", self.mws_project):
+                raise ValueError("MWS_PROJECT has an invalid format")
+            if not self.mws_api_key.get_secret_value():
+                raise ValueError("MWS_API_KEY is required for MWS AI")
         return self
 
-    @field_validator("ollama_url", "ted_base_url", "contracts_finder_base_url")
+    @field_validator("ollama_url", "mws_base_url", "ted_base_url", "contracts_finder_base_url")
     @classmethod
     def strip_trailing_slash(cls, value: str) -> str:
         return value.rstrip("/")
@@ -94,6 +111,14 @@ class Settings(BaseSettings):
         if value != 1024:
             raise ValueError("embedding_dimensions должна быть равна 1024")
         return value
+
+    @property
+    def active_embedding_model(self) -> str:
+        return self.mws_embedding_model if self.ai_mode == "mws" else self.embedding_model
+
+    @property
+    def mws_openai_base_url(self) -> str:
+        return f"{self.mws_base_url}/projects/{self.mws_project}/openai/v1"
 
 
 @lru_cache(maxsize=1)

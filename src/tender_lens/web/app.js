@@ -38,7 +38,7 @@ function createResult(item) {
   badge.textContent = item.source;
   const score = document.createElement("span");
   score.className = "score";
-  score.textContent = `cosine: ${Number(item.score).toFixed(3)} · mock embeddings`;
+  score.textContent = `cosine: ${Number(item.score).toFixed(3)} · bge-m3`;
   top.append(badge, score);
 
   const title = document.createElement("h3");

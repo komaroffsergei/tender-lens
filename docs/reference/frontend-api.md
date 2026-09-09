@@ -9,17 +9,22 @@
 |---|---|---|---|
 | `#health` | `span` | DOM anchor/control `health`. | [L18](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L18) |
 | `#workspace-title` | `h2` | DOM anchor/control `workspace-title`. | [L30](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L30) |
-| `#api-key` | `input` | DOM anchor/control `api-key`. | [L33](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L33) |
-| `#save-key` | `button` | DOM anchor/control `save-key`. | [L34](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L34) |
-| `#query` | `textarea` | DOM anchor/control `query`. | [L39](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L39) |
-| `#submit` | `button` | DOM anchor/control `submit`. | [L46](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L46) |
-| `#rate-state` | `span` | DOM anchor/control `rate-state`. | [L59](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L59) |
-| `#notice` | `section` | DOM anchor/control `notice`. | [L64](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L64) |
-| `#answer-card` | `section` | DOM anchor/control `answer-card`. | [L66](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L66) |
-| `#answer-text` | `p` | DOM anchor/control `answer-text`. | [L68](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L68) |
-| `#results-title` | `h2` | DOM anchor/control `results-title`. | [L76](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L76) |
-| `#results` | `div` | DOM anchor/control `results`. | [L80](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L80) |
-| `#empty` | `p` | DOM anchor/control `empty`. | [L81](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L81) |
+| `#api-key` | `input` | DOM anchor/control `api-key`. | [L31](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L31) |
+| `#save-key` | `button` | DOM anchor/control `save-key`. | [L31](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L31) |
+| `#demo-reset` | `button` | DOM anchor/control `demo-reset`. | [L33](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L33) |
+| `#query` | `textarea` | DOM anchor/control `query`. | [L35](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L35) |
+| `#submit` | `button` | DOM anchor/control `submit`. | [L42](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L42) |
+| `#rate-state` | `span` | DOM anchor/control `rate-state`. | [L55](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L55) |
+| `#replay` | `button` | DOM anchor/control `replay`. | [L60](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L60) |
+| `#refresh-index` | `button` | DOM anchor/control `refresh-index`. | [L60](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L60) |
+| `#index-state` | `pre` | DOM anchor/control `index-state`. | [L60](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L60) |
+| `#replay-state` | `output` | DOM anchor/control `replay-state`. | [L60](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L60) |
+| `#notice` | `section` | DOM anchor/control `notice`. | [L61](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L61) |
+| `#answer-card` | `section` | DOM anchor/control `answer-card`. | [L63](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L63) |
+| `#answer-text` | `p` | DOM anchor/control `answer-text`. | [L65](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L65) |
+| `#results-title` | `h2` | DOM anchor/control `results-title`. | [L73](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L73) |
+| `#results` | `div` | DOM anchor/control `results`. | [L77](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L77) |
+| `#empty` | `p` | DOM anchor/control `empty`. | [L78](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/index.html#L78) |
 
 ## JavaScript functions
 
@@ -131,3 +136,12 @@
 | `.results-head` | Визуальное правило UI selector. | [L79](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/styles.css#L79) |
 | `.sort-note` | Визуальное правило UI selector. | [L79](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/styles.css#L79) |
 | `footer` | Визуальное правило UI selector. | [L79](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/styles.css#L79) |
+| `.demo-notice` | Визуальное правило UI selector. | [L79](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/styles.css#L79) |
+| `.demo-notice p` | Визуальное правило UI selector. | [L81](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/styles.css#L81) |
+| `.demo-examples` | Визуальное правило UI selector. | [L81](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/styles.css#L81) |
+| `.demo-examples button` | Визуальное правило UI selector. | [L81](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/styles.css#L81) |
+| `.demo-index button` | Визуальное правило UI selector. | [L81](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/styles.css#L81) |
+| `.demo-index` | Визуальное правило UI selector. | [L81](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/styles.css#L81) |
+| `.demo-index p` | Визуальное правило UI selector. | [L81](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/styles.css#L81) |
+| `.demo-index pre` | Визуальное правило UI selector. | [L81](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/styles.css#L81) |
+| `.demo-index output` | Визуальное правило UI selector. | [L81](https://github.com/komaroffsergei/tender-lens/blob/main/src/tender_lens/web/styles.css#L81) |

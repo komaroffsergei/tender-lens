@@ -10,7 +10,7 @@ from pathlib import Path
 from pydantic import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
-from tender_lens.ai import FakeAIProvider, OllamaAIProvider
+from tender_lens.ai import AIProvider, FakeAIProvider, MwsAIProvider, OllamaAIProvider
 from tender_lens.config import get_settings
 from tender_lens.db import create_engine, create_session_factory
 from tender_lens.errors import DependencyUnavailableError
@@ -34,17 +34,28 @@ async def run() -> None:
     broker = NatsBroker(settings)
     await broker.connect()
     Path("/tmp/indexer-ready").touch()
-    ai = (
-        FakeAIProvider(settings.embedding_dimensions)
-        if settings.ai_mode == "fake"
-        else OllamaAIProvider(
+    ai: AIProvider
+    if settings.ai_mode == "fake":
+        ai = FakeAIProvider(settings.embedding_dimensions)
+    elif settings.ai_mode == "mws":
+        ai = MwsAIProvider(
+            base_url=settings.mws_openai_base_url,
+            api_key=settings.mws_api_key.get_secret_value(),
+            embedding_model=settings.mws_embedding_model,
+            generation_model=settings.mws_generation_model,
+            dimensions=settings.embedding_dimensions,
+            reasoning_effort=settings.mws_reasoning_effort,
+            max_completion_tokens=settings.mws_max_completion_tokens,
+            timeout_seconds=settings.mws_timeout_seconds,
+        )
+    else:
+        ai = OllamaAIProvider(
             base_url=settings.ollama_url,
             embedding_model=settings.embedding_model,
             generation_model=settings.generation_model,
             dimensions=settings.embedding_dimensions,
             timeout_seconds=settings.ollama_timeout_seconds,
         )
-    )
     service = IndexerService(settings=settings, session_factory=sessions, ai=ai)
 
     try:
@@ -80,7 +91,7 @@ async def run() -> None:
                 await message.term()
     finally:
         Path("/tmp/indexer-ready").unlink(missing_ok=True)
-        if isinstance(ai, OllamaAIProvider):
+        if isinstance(ai, (MwsAIProvider, OllamaAIProvider)):
             await ai.aclose()
         await broker.close()
         await engine.dispose()

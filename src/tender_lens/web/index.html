@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="TenderLens: смысловой поиск и локальный RAG по открытым закупкам">
+  <meta name="description" content="TenderLens: смысловой поиск и RAG по корпусу закупок">
   <title>TenderLens</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%234f46e5'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-size='28' font-family='Arial' font-weight='700' fill='white'%3ETL%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="/static/styles.css">
@@ -13,7 +13,7 @@
   <header class="topbar">
     <a class="brand" href="/" aria-label="TenderLens, главная">
       <span class="brand-mark" aria-hidden="true">TL</span>
-      <span><strong>TenderLens</strong><small>Синтетический корпус</small></span>
+      <span><strong>TenderLens</strong><small>MWS · pgvector · NATS</small></span>
     </a>
     <span id="health" class="status-pill" aria-live="polite">Проверяем API…</span>
   </header>
@@ -22,14 +22,14 @@
     <section class="hero">
       <p class="eyebrow">Демонстрация · pgvector · NATS JetStream</p>
       <h1>Найти документ. Проверить источник.</h1>
-      <p>Четыре учебных документа проходят настоящие извлечение, разбиение на чанки и индексацию. Внешний сбор отключён. В рабочей версии источниками служат TED и Contracts Finder.</p>
+      <p>Четыре учебных документа проходят извлечение, разбиение на чанки и индексацию. Семантические векторы строит bge-m3, ответ формирует gpt-oss-120b в MWS Model Hub. Внешний сбор отключён; рабочие адаптеры используют TED и Contracts Finder.</p>
     </section>
 
     <section class="workspace" aria-labelledby="workspace-title">
       <div class="search-panel">
         <h2 id="workspace-title" class="sr-only">Запрос к базе закупок</h2>
         <input id="api-key" type="hidden" value="portfolio-session"><button id="save-key" hidden></button>
-        <div class="demo-notice"><strong>Демонстрационный режим: используются моки</strong><p>Embeddings заменены детерминированным хешированием токенов, LLM — шаблонным ответом из найденных фрагментов. NATS, извлечение текста, PostgreSQL и cosine search работают реально. Показатель cosine не является оценкой качества модели.</p></div>
+        <div class="demo-notice"><strong>Реальные модели MWS, синтетические документы</strong><p>Embeddings и текст ответа считаются внешними деплойментами MWS. NATS, извлечение текста, PostgreSQL, pgvector и cosine search работают на стенде. Документы вымышлены и не содержат данных заказчиков.</p></div>
         <div class="demo-examples"><button type="button" data-query="серверы гарантия 36 месяцев">Серверы и гарантия</button><button type="button" data-query="Angular TypeScript формы">Angular-портал</button><button type="button" data-query="ананасы космонавты балет">Нет контекста</button><button type="button" id="demo-reset">Сбросить мой пример</button></div>
         <label class="query-label" for="query">Запрос</label>
         <textarea id="query" rows="5" maxlength="1000" placeholder="Например: поставка серверов и системы хранения с гарантией 36 месяцев"></textarea>
@@ -48,7 +48,7 @@
         <ol>
           <li>Запрос превращается в embedding.</li>
           <li>PostgreSQL находит ближайшие чанки.</li>
-          <li>В режиме ответа мок использует только найденные фрагменты.</li>
+          <li>В режиме ответа gpt-oss-120b получает только найденные фрагменты.</li>
         </ol>
         <div class="limit-card">
           <strong>Общий лимит Search + Ask</strong>
@@ -81,7 +81,7 @@
 
   <footer>
     <span>TenderLens 0.2.0</span>
-    <span>Статический интерфейс без CDN и внешних зависимостей.</span>
+    <span>Интерфейс без CDN; inference — MWS Model Hub.</span>
   </footer>
 </body>
 </html>

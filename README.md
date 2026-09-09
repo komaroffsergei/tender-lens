@@ -45,6 +45,9 @@ TED / Contracts Finder
                           ▲
                           │
  Browser ──► FastAPI ──► Search / grounded RAG
+                              │
+                              ▼
+                       Ollama / MWS Model Hub
 ```
 
 Состав Compose:
@@ -168,6 +171,20 @@ docker compose --profile ai up --build -d
 
 Профиль загружает `qwen3-embedding:0.6b` и `qwen3:1.7b`. Размерность embedding зафиксирована миграцией как 1024.
 
+## Реальный MWS Model Hub
+
+MWS использует OpenAI-совместимые endpoints для embeddings и Chat Completions. Ключ передаётся только через локальный `.env` или secret storage и не попадает в image:
+
+```dotenv
+AI_MODE=mws
+MWS_PROJECT=tenderlens-demo
+MWS_API_KEY=...
+MWS_EMBEDDING_MODEL=bge-m3
+MWS_GENERATION_MODEL=<deployment-id>
+```
+
+`bge-m3` возвращает 1024-компонентные векторы. После перехода с fake/Ollama на MWS все документы нужно переиндексировать: векторы разных providers нельзя смешивать.
+
 ## Проверки
 
 Локальные проверки Python:
@@ -192,7 +209,7 @@ TEST_NATS_URL=nats://localhost:54222 \
   python -m pytest -q
 ```
 
-GitHub Actions проверяет Black, Flake8, MyPy, unit/API, PostgreSQL/pgvector, настоящий NATS, полный fixture E2E, downgrade/upgrade migration, Docker build, Compose config и запуск всех трёх ролей. Live API и Ollama не входят в обязательный CI.
+GitHub Actions проверяет Black, Flake8, MyPy, unit/API, PostgreSQL/pgvector, настоящий NATS, полный fixture E2E, downgrade/upgrade migration, Docker build, Compose config и запуск всех трёх ролей. Живые Ollama/MWS endpoints не входят в обязательный CI.
 
 ## Ограничения
 
